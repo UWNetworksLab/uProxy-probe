@@ -58,5 +58,4 @@ module Log {
     freedom.emit('print', m);
   });
 
-  freedom.on('')
 }
