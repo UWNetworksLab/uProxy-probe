@@ -1,0 +1,401 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+  Version="10.0"
+  VendorName="SlickEdit"
+  TemplateName="(Other)"
+  WorkingDir=".">
+  <Config
+    Name="Release"
+    OutputFile=""
+    CompilerConfigName="">
+    <Menu>
+      <Target
+        Name="Compile"
+        MenuCaption="&amp;Compile"
+        CaptureOutputWith="ProcessBuffer"
+        SaveOption="SaveCurrent"
+        RunFromDir="%rw">
+        <Exec/>
+      </Target>
+      <Target
+        Name="Build"
+        MenuCaption="&amp;Build"
+        CaptureOutputWith="ProcessBuffer"
+        SaveOption="SaveWorkspaceFiles"
+        RunFromDir="%rw">
+        <Set
+          Name="PATH"
+          Value="/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/bin/g4bin"/>
+        <Exec CmdLine="grunt"/>
+      </Target>
+      <Target
+        Name="Rebuild"
+        MenuCaption="&amp;Rebuild"
+        CaptureOutputWith="ProcessBuffer"
+        SaveOption="SaveWorkspaceFiles"
+        RunFromDir="%rw">
+        <Exec/>
+      </Target>
+      <Target
+        Name="Debug"
+        MenuCaption="&amp;Debug"
+        SaveOption="SaveNone"
+        RunFromDir="%rw">
+        <Exec/>
+      </Target>
+      <Target
+        Name="Execute"
+        MenuCaption="E&amp;xecute"
+        SaveOption="SaveNone"
+        RunFromDir="%rw">
+        <Exec CmdLine='".exe"'/>
+      </Target>
+    </Menu>
+  </Config>
+  <CustomFolders>
+    <Folder
+      Name="Source Files"
+      Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go">
+    </Folder>
+    <Folder
+      Name="Header Files"
+      Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if">
+    </Folder>
+    <Folder
+      Name="Resource Files"
+      Filters="*.ico;*.cur;*.dlg">
+    </Folder>
+    <Folder
+      Name="Bitmaps"
+      Filters="*.bmp"/>
+    <Folder
+      Name="Other Files"
+      Filters="">
+    </Folder>
+  </CustomFolders>
+  <Files AutoFolders="DirectoryView">
+    <Folder Name="node_modules">
+      <Folder Name="freedom">
+        <Folder Name="demo">
+          <Folder Name="aboutme">
+            <F N="node_modules/freedom/demo/aboutme/aboutme.js"/>
+            <F N="node_modules/freedom/demo/aboutme/identity.js"/>
+            <F N="node_modules/freedom/demo/aboutme/identity.json"/>
+            <F N="node_modules/freedom/demo/aboutme/identityview.html"/>
+            <F N="node_modules/freedom/demo/aboutme/index.html"/>
+            <F N="node_modules/freedom/demo/aboutme/manifest.json"/>
+            <F N="node_modules/freedom/demo/aboutme/README.md"/>
+          </Folder>
+          <Folder Name="chat">
+            <F N="node_modules/freedom/demo/chat/index.html"/>
+            <F N="node_modules/freedom/demo/chat/main.js"/>
+            <F N="node_modules/freedom/demo/chat/manifest.json"/>
+            <F N="node_modules/freedom/demo/chat/README.md"/>
+            <F N="node_modules/freedom/demo/chat/ux.js"/>
+          </Folder>
+          <Folder Name="connections">
+            <Folder Name="third-party">
+              <Folder Name="qr">
+                <F N="node_modules/freedom/demo/connections/third-party/qr/LICENSE.md"/>
+                <F N="node_modules/freedom/demo/connections/third-party/qr/qr.js"/>
+              </Folder>
+            </Folder>
+            <F N="node_modules/freedom/demo/connections/index.html"/>
+            <F N="node_modules/freedom/demo/connections/main.js"/>
+            <F N="node_modules/freedom/demo/connections/manifest.json"/>
+            <F N="node_modules/freedom/demo/connections/README.md"/>
+            <F N="node_modules/freedom/demo/connections/view.css"/>
+            <F N="node_modules/freedom/demo/connections/view.html"/>
+            <F N="node_modules/freedom/demo/connections/view.js"/>
+          </Folder>
+          <Folder Name="counter">
+            <F N="node_modules/freedom/demo/counter/counter.js"/>
+            <F N="node_modules/freedom/demo/counter/index.html"/>
+            <F N="node_modules/freedom/demo/counter/manifest.json"/>
+            <F N="node_modules/freedom/demo/counter/README.md"/>
+          </Folder>
+          <Folder Name="customchannel">
+            <F N="node_modules/freedom/demo/customchannel/friend.js"/>
+            <F N="node_modules/freedom/demo/customchannel/friend.json"/>
+            <F N="node_modules/freedom/demo/customchannel/index.html"/>
+            <F N="node_modules/freedom/demo/customchannel/main.js"/>
+            <F N="node_modules/freedom/demo/customchannel/manifest.json"/>
+            <F N="node_modules/freedom/demo/customchannel/README.md"/>
+          </Folder>
+          <Folder Name="filedrop">
+            <Folder Name="freedom-modules">
+              <F N="node_modules/freedom/demo/filedrop/freedom-modules/main.js"/>
+              <F N="node_modules/freedom/demo/filedrop/freedom-modules/manifest.json"/>
+            </Folder>
+            <F N="node_modules/freedom/demo/filedrop/file.png"/>
+            <F N="node_modules/freedom/demo/filedrop/FileSaver.js"/>
+            <F N="node_modules/freedom/demo/filedrop/index.html"/>
+            <F N="node_modules/freedom/demo/filedrop/page.css"/>
+            <F N="node_modules/freedom/demo/filedrop/page.js"/>
+            <F N="node_modules/freedom/demo/filedrop/README.md"/>
+          </Folder>
+          <Folder Name="tictak">
+            <F N="node_modules/freedom/demo/tictak/index.html"/>
+            <F N="node_modules/freedom/demo/tictak/main.js"/>
+            <F N="node_modules/freedom/demo/tictak/manifest.json"/>
+            <F N="node_modules/freedom/demo/tictak/README.md"/>
+          </Folder>
+          <F N="node_modules/freedom/demo/index.html"/>
+          <F N="node_modules/freedom/demo/style.css"/>
+        </Folder>
+        <Folder Name="interface">
+          <F N="node_modules/freedom/interface/core.js"/>
+          <F N="node_modules/freedom/interface/social.js"/>
+          <F N="node_modules/freedom/interface/storage.js"/>
+          <F N="node_modules/freedom/interface/transport.js"/>
+        </Folder>
+        <Folder Name="providers">
+          <Folder Name="core">
+            <F N="node_modules/freedom/providers/core/core.unprivileged.js"/>
+            <F N="node_modules/freedom/providers/core/echo.unprivileged.js"/>
+            <F N="node_modules/freedom/providers/core/peerconnection.unprivileged.js"/>
+            <F N="node_modules/freedom/providers/core/storage.localstorage.js"/>
+            <F N="node_modules/freedom/providers/core/view.unprivileged.js"/>
+            <F N="node_modules/freedom/providers/core/websocket.unprivileged.js"/>
+          </Folder>
+          <Folder Name="social">
+            <Folder Name="loopback">
+              <F N="node_modules/freedom/providers/social/loopback/social.loopback.js"/>
+              <F N="node_modules/freedom/providers/social/loopback/social.loopback.json"/>
+            </Folder>
+            <Folder Name="manual">
+              <F N="node_modules/freedom/providers/social/manual/identity.manual.js"/>
+              <F N="node_modules/freedom/providers/social/manual/identity.manual.json"/>
+            </Folder>
+            <Folder Name="websocket-server">
+              <F N="node_modules/freedom/providers/social/websocket-server/README.md"/>
+              <F N="node_modules/freedom/providers/social/websocket-server/social.ws.js"/>
+              <F N="node_modules/freedom/providers/social/websocket-server/social.ws.json"/>
+            </Folder>
+          </Folder>
+          <Folder Name="storage">
+            <Folder Name="isolated">
+              <F N="node_modules/freedom/providers/storage/isolated/storage.isolated.js"/>
+              <F N="node_modules/freedom/providers/storage/isolated/storage.isolated.json"/>
+            </Folder>
+            <Folder Name="shared">
+              <F N="node_modules/freedom/providers/storage/shared/storage.shared.js"/>
+              <F N="node_modules/freedom/providers/storage/shared/storage.shared.json"/>
+            </Folder>
+          </Folder>
+          <Folder Name="transport">
+            <Folder Name="webrtc">
+              <F N="node_modules/freedom/providers/transport/webrtc/transport.webrtc.js"/>
+              <F N="node_modules/freedom/providers/transport/webrtc/transport.webrtc.json"/>
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="spec">
+          <Folder Name="helper">
+            <F N="node_modules/freedom/spec/helper/app.js"/>
+            <F N="node_modules/freedom/spec/helper/beacon.js"/>
+            <F N="node_modules/freedom/spec/helper/channel.js"/>
+            <F N="node_modules/freedom/spec/helper/channel.json"/>
+            <F N="node_modules/freedom/spec/helper/friend.js"/>
+            <F N="node_modules/freedom/spec/helper/friend.json"/>
+            <F N="node_modules/freedom/spec/helper/manifest.json"/>
+            <F N="node_modules/freedom/spec/helper/providers.js"/>
+            <F N="node_modules/freedom/spec/helper/providers.json"/>
+          </Folder>
+          <Folder Name="providers">
+            <Folder Name="core">
+              <F N="node_modules/freedom/spec/providers/core/core.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/core/echo.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/core/peerconnection.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/core/storage.unit.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/core/view.unit.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/core/websocket.spec.js"/>
+            </Folder>
+            <Folder Name="social">
+              <F N="node_modules/freedom/spec/providers/social/social.double.integration.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/social/social.loopback.unit.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/social/social.single.integration.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/social/social.ws.unit.spec.js"/>
+            </Folder>
+            <Folder Name="storage">
+              <F N="node_modules/freedom/spec/providers/storage/storage.integration.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/storage/storage.isolated-shared.integration.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/storage/storage.isolated.unit.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/storage/storage.shared.unit.spec.js"/>
+            </Folder>
+            <Folder Name="transport">
+              <F N="node_modules/freedom/spec/providers/transport/transport.integration.spec.js"/>
+              <F N="node_modules/freedom/spec/providers/transport/transport.webrtc.unit.spec.js"/>
+            </Folder>
+          </Folder>
+          <Folder Name="src">
+            <F N="node_modules/freedom/spec/src/apis.spec.js"/>
+            <F N="node_modules/freedom/spec/src/debug.spec.js"/>
+            <F N="node_modules/freedom/spec/src/freedom.spec.js"/>
+            <F N="node_modules/freedom/spec/src/freedomModule.spec.js"/>
+            <F N="node_modules/freedom/spec/src/hub.spec.js"/>
+            <F N="node_modules/freedom/spec/src/manager.spec.js"/>
+            <F N="node_modules/freedom/spec/src/module.spec.js"/>
+            <F N="node_modules/freedom/spec/src/moduleInternal.spec.js"/>
+            <F N="node_modules/freedom/spec/src/provider.spec.js"/>
+            <F N="node_modules/freedom/spec/src/proxy.spec.js"/>
+            <F N="node_modules/freedom/spec/src/proxyAPIInterface.spec.js"/>
+            <F N="node_modules/freedom/spec/src/resource.spec.js"/>
+            <F N="node_modules/freedom/spec/src/util.spec.js"/>
+          </Folder>
+          <F N="node_modules/freedom/spec/util.js"/>
+        </Folder>
+        <Folder Name="src">
+          <Folder Name="link">
+            <F N="node_modules/freedom/src/link/direct.js"/>
+            <F N="node_modules/freedom/src/link/frame.js"/>
+            <F N="node_modules/freedom/src/link/worker.js"/>
+          </Folder>
+          <Folder Name="proxy">
+            <F N="node_modules/freedom/src/proxy/apiInterface.js"/>
+            <F N="node_modules/freedom/src/proxy/eventInterface.js"/>
+          </Folder>
+          <Folder Name="util">
+            <F N="node_modules/freedom/src/util/jshinthelper.js"/>
+            <F N="node_modules/freedom/src/util/postamble.js"/>
+            <F N="node_modules/freedom/src/util/preamble.js"/>
+          </Folder>
+          <F N="node_modules/freedom/src/apis.js"/>
+          <F N="node_modules/freedom/src/entry.js"/>
+          <F N="node_modules/freedom/src/hub.js"/>
+          <F N="node_modules/freedom/src/link.js"/>
+          <F N="node_modules/freedom/src/port-debug.js"/>
+          <F N="node_modules/freedom/src/port-manager.js"/>
+          <F N="node_modules/freedom/src/port-module.js"/>
+          <F N="node_modules/freedom/src/port-moduleinternal.js"/>
+          <F N="node_modules/freedom/src/port-provider.js"/>
+          <F N="node_modules/freedom/src/port-proxy.js"/>
+          <F N="node_modules/freedom/src/port-runtime.js"/>
+          <F N="node_modules/freedom/src/resource.js"/>
+          <F N="node_modules/freedom/src/util.js"/>
+        </Folder>
+        <Folder Name="tools">
+          <Folder Name="chromeTestRunner">
+            <Folder Name="freedom">
+              <F N="node_modules/freedom/tools/chromeTestRunner/freedom/core.storage.chrome.js"/>
+              <F N="node_modules/freedom/tools/chromeTestRunner/freedom/register.js"/>
+            </Folder>
+            <F N="node_modules/freedom/tools/chromeTestRunner/background.js"/>
+            <F N="node_modules/freedom/tools/chromeTestRunner/manifest.json"/>
+            <F N="node_modules/freedom/tools/chromeTestRunner/runTests.js"/>
+            <F N="node_modules/freedom/tools/chromeTestRunner/tester-256.png"/>
+            <F N="node_modules/freedom/tools/chromeTestRunner/window-postamble.html"/>
+            <F N="node_modules/freedom/tools/chromeTestRunner/window-preamble.html"/>
+          </Folder>
+          <F N="node_modules/freedom/tools/chromeTestRunner.sh"/>
+          <F N="node_modules/freedom/tools/chromeTestRunnerHelp.md"/>
+          <F N="node_modules/freedom/tools/releases.sh"/>
+        </Folder>
+        <F N="node_modules/freedom/.jshintrc"/>
+        <F N="node_modules/freedom/.npmignore"/>
+        <F N="node_modules/freedom/.travis.yml"/>
+        <F N="node_modules/freedom/bower.json"/>
+        <F N="node_modules/freedom/freedom.js"/>
+        <F N="node_modules/freedom/freedom.map"/>
+        <F N="node_modules/freedom/freedom.min.js"/>
+        <F N="node_modules/freedom/freedom.min.map"/>
+        <F N="node_modules/freedom/Gruntfile.js"/>
+        <F N="node_modules/freedom/package.json"/>
+        <F N="node_modules/freedom/README.md"/>
+      </Folder>
+      <Folder Name="freedom-for-chrome">
+        <Folder Name="extension_spec">
+          <F N="node_modules/freedom-for-chrome/extension_spec/main.spec.js"/>
+        </Folder>
+        <Folder Name="helper">
+          <F N="node_modules/freedom-for-chrome/helper/template.tmpl"/>
+        </Folder>
+        <Folder Name="providers">
+          <F N="node_modules/freedom-for-chrome/providers/storage.js"/>
+          <F N="node_modules/freedom-for-chrome/providers/tcpsocket.js"/>
+          <F N="node_modules/freedom-for-chrome/providers/udpsocket.js"/>
+        </Folder>
+        <Folder Name="spec">
+          <F N="node_modules/freedom-for-chrome/spec/main.spec.js"/>
+          <F N="node_modules/freedom-for-chrome/spec/udpsocket.unit.spec.js"/>
+        </Folder>
+        <Folder Name="tools">
+          <F N="node_modules/freedom-for-chrome/tools/release.sh"/>
+        </Folder>
+        <F N="node_modules/freedom-for-chrome/.npmignore"/>
+        <F N="node_modules/freedom-for-chrome/freedom-for-chrome.js"/>
+        <F N="node_modules/freedom-for-chrome/Gruntfile.js"/>
+        <F N="node_modules/freedom-for-chrome/package.json"/>
+        <F N="node_modules/freedom-for-chrome/README.md"/>
+      </Folder>
+      <Folder Name="freedom-typescript-api">
+        <Folder Name="interfaces">
+          <F N="node_modules/freedom-typescript-api/interfaces/freedom.d.ts"/>
+          <F N="node_modules/freedom-typescript-api/interfaces/peer-connection.d.ts"/>
+          <F N="node_modules/freedom-typescript-api/interfaces/promise.d.ts"/>
+          <F N="node_modules/freedom-typescript-api/interfaces/social.d.ts"/>
+          <F N="node_modules/freedom-typescript-api/interfaces/tcp-socket.d.ts"/>
+          <F N="node_modules/freedom-typescript-api/interfaces/transport.d.ts"/>
+          <F N="node_modules/freedom-typescript-api/interfaces/udp-socket.d.ts"/>
+        </Folder>
+        <F N="node_modules/freedom-typescript-api/.npmignore"/>
+        <F N="node_modules/freedom-typescript-api/package.json"/>
+        <F N="node_modules/freedom-typescript-api/README.md"/>
+      </Folder>
+      <Folder Name="uproxy-build-tools">
+        <F N="node_modules/uproxy-build-tools/.npmignore"/>
+        <F N="node_modules/uproxy-build-tools/.travis.yml"/>
+        <F N="node_modules/uproxy-build-tools/Gruntfile.coffee"/>
+        <F N="node_modules/uproxy-build-tools/package.json"/>
+        <F N="node_modules/uproxy-build-tools/README.md"/>
+      </Folder>
+    </Folder>
+    <Folder Name="src">
+      <Folder Name="chrome-app">
+        <F N="src/chrome-app/background.js"/>
+        <F N="src/chrome-app/logencrypt.js"/>
+        <F N="src/chrome-app/manifest.json"/>
+        <F N="src/chrome-app/uprobe.html"/>
+        <F N="src/chrome-app/uprobe.js"/>
+      </Folder>
+      <Folder Name="common">
+        <F N="src/common/arraybuffers.spec.ts"/>
+        <F N="src/common/arraybuffers.ts"/>
+        <F N="src/common/log.ts"/>
+      </Folder>
+      <Folder Name="diagnose">
+        <F N="src/diagnose/diagnose.json"/>
+        <F N="src/diagnose/diagnose.ts"/>
+      </Folder>
+      <Folder Name="interfaces">
+        <F N="src/interfaces/arraybuffer.d.ts"/>
+        <F N="src/interfaces/arraybuffers.d.ts"/>
+      </Folder>
+      <Folder Name="logger">
+        <F N="src/logger/logger.json"/>
+        <F N="src/logger/logger.ts"/>
+      </Folder>
+      <Folder Name="pidCrypt">
+        <F N="src/pidCrypt/aes_cbc.js"/>
+        <F N="src/pidCrypt/aes_core.js"/>
+        <F N="src/pidCrypt/aes_ctr.js"/>
+        <F N="src/pidCrypt/asn1.js"/>
+        <F N="src/pidCrypt/jsbn.js"/>
+        <F N="src/pidCrypt/md5.js"/>
+        <F N="src/pidCrypt/oids.js"/>
+        <F N="src/pidCrypt/pidcrypt.js"/>
+        <F N="src/pidCrypt/pidcrypt_util.js"/>
+        <F N="src/pidCrypt/prng4.js"/>
+        <F N="src/pidCrypt/rng.js"/>
+        <F N="src/pidCrypt/rsa.js"/>
+        <F N="src/pidCrypt/sha1.js"/>
+        <F N="src/pidCrypt/sha256.js"/>
+        <F N="src/pidCrypt/sha512.js"/>
+        <F N="src/pidCrypt/string_extend.js"/>
+      </Folder>
+    </Folder>
+    <F N="Gruntfile.coffee"/>
+    <F N="package.json"/>
+    <F N="README.md"/>
+  </Files>
+</Project>

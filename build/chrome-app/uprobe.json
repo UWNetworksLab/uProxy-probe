@@ -1,0 +1,15 @@
+{
+  "name": "diagnose",
+  "description": "Diagnose Freedom manifest",
+  "app": {
+    "script": [
+      "diagnose.js"
+    ]
+  },
+  "dependencies": {
+  },
+  "permissions": [
+    "core.tcpsocket",
+    "core.udpsocket"
+  ]
+}

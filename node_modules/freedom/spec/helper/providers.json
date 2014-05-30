@@ -1,0 +1,29 @@
+{
+  "name": "Provider Test Helper",
+  "description": "Helper backend for tests involving provider APIs",
+  "app": {
+    "script": "providers.js"
+  },
+  "dependencies": {
+    "storage.shared": {
+      "url": "../../providers/storage/shared/storage.shared.json",
+      "api": "storage"
+    },
+    "storage.isolated": {
+      "url": "../../providers/storage/isolated/storage.isolated.json",
+      "api": "storage"
+    },
+    "transport.webrtc": {
+      "url": "../../providers/transport/webrtc/transport.webrtc.json",
+      "api": "transport"
+    },
+    "social.loopback": {
+      "url": "../../providers/social/loopback/social.loopback.json",
+      "api": "social"
+    },
+    "social.ws": {
+      "url": "../../providers/social/websocket-server/social.ws.json",
+      "api": "social"
+    }
+  }
+}
