@@ -12,6 +12,7 @@ module Diagnose {
     Log.debug('received command ' + m);
     if (m == 'send_udp') {
       doUdpTest();
+    } else if (m == 'stun_access') {
     }
   });
 
@@ -60,7 +61,13 @@ module Diagnose {
     'stun:stun4.l.google.com:19302',
   ];
 
-  function testAgainStunServers() {
+  export function doStunAccessTest() {
+    for (var i = 0; i < stunServers.length; i++) {
+      pingStunServer(stunServers[i]);
+    }
+  }
+
+  function pingStunServer(serverAddr: string) {
 
   }
 

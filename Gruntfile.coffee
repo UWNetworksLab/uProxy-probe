@@ -24,7 +24,7 @@ module.exports = (grunt) ->
         dest: 'build/' } ] }
       logger: { files: [ {
         expand: true, cwd: 'src/'
-        src: ['logger/**/*.json']
+        src: ['logger/**/*.json', '**/*.js']
         dest: 'build/' } ] }
       pidCrypt: { files: [ {
         expand: true, cwd: 'src/'
@@ -74,6 +74,18 @@ module.exports = (grunt) ->
         options: { basePath: 'src/', ignoreError: false }
     }
 
+    jasmine: {
+      logger:
+        src: [
+          'node_modules/es6-promise/dist/promise-*.js',
+          '!node_modules/es6-promise/dist/promise-*amd.js',
+          '!node_modules/es6-promise/dist/promise-*.min.js',
+          'build/chrome-app/logger/mocks.js',
+          'build/chrome-app/logger/logger.js'
+          ]
+        options: { specs: 'build/logger/**/*.spec.js'}
+    }
+
     clean: ['build/**']
   }  # grunt.initConfig
 
@@ -82,6 +94,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-typescript'
   grunt.loadNpmTasks 'grunt-env'
+  grunt.loadNpmTasks 'grunt-contrib-jasmine'
 
   #-------------------------------------------------------------------------
   # Define the tasks
@@ -100,10 +113,9 @@ module.exports = (grunt) ->
     'copy:chromeApp'
   ]
 
-  # This is the target run by Travis. Targets in here should run locally
-  # and on Travis/Sauce Labs.
   taskManager.add 'test', [
     'build'
+    'jasmine:logger'
   ]
 
   taskManager.add 'default', [
