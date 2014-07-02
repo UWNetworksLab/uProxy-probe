@@ -4,17 +4,18 @@
 
 window.onload = function() {
   var button = document.getElementById('get-log-btn');
+
   button.onclick = function(e) {
-    window.freedom.emit('logger.getLog');
+    window.freedom.emit('getLogs');
   };
 
   outputLine('uProbe started');
-  Log.setTag('uprobe');
-  Log.debug('perform send_udp test');
-  freedom.emit('logger.info', { tag: 'uprobe', msg: 'send_udp test'});
-  window.freedom.emit('command', 'send_udp');
+  // logger.debug('uprobe', 'perform send_udp test');
+  // logger.info('uprobe', 'send_udp test');
 
-  // testRsaEncryption();
+  freedom.emit('command', 'send_udp');
+
+  testRsaEncryption();
 }
 
 
@@ -54,4 +55,3 @@ window.freedom.on('print', function(msg) {
     outputLine(lines[i]);
   }
 });
-

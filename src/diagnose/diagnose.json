@@ -3,12 +3,11 @@
   "description": "Diagnose Freedom manifest",
   "app": {
     "script": [
-      "../common/log.js",
       "diagnose.js"
     ]
   },
   "dependencies": {
-    "logger": {
+    "Logger": {
       "url": "/logger/logger.json"
     }
   },

@@ -1,15 +1,16 @@
-/// <reference path='../common/log.ts' />
 /// <reference path='../../node_modules/freedom-typescript-api/interfaces/freedom.d.ts' />
-/// <reference path='../../node_modules/freedom-typescript-api/interfaces/udp-socket.d.ts' />
 /// <reference path='../../node_modules/freedom-typescript-api/interfaces/promise.d.ts' />
+/// <reference path='../../node_modules/uproxy-build-tools/src/logger/logger.d.ts' />
+/// <reference path='../../node_modules/freedom-typescript-api/interfaces/udp-socket.d.ts' />
 
 module Diagnose {
   import UdpSocket = freedom.UdpSocket;
+  var logger = freedom['Logger']();
 
-  Log.setTag('Diagnose');
+  var tag = 'Diagnose';
 
   freedom.on('command', function(m) {
-    Log.debug('received command ' + m);
+    logger.debug(tag, 'received command ' + m);
     if (m == 'send_udp') {
       doUdpTest();
     } else if (m == 'stun_access') {
@@ -21,14 +22,14 @@ module Diagnose {
   }
 
   export function doUdpTest() {
-    Log.debug('start udp test');
+    logger.debug(tag, 'start udp test');
     var socket:UdpSocket = freedom['core.udpsocket']();
 
     function onUdpData(info: UdpSocket.RecvFromInfo) {
       var response = new Uint32Array(info.data);
-      Log.info('Ping response received from %1:%2, latency=%3ms',
-               info.address, info.port,
-               (new Date()).getMilliseconds() - response[0]);
+      logger.info(tag, 'Ping response received from %1:%2, latency=%3ms',
+                  info.address, info.port,
+                  (new Date()).getMilliseconds() - response[0]);
     }   
 
     socket.bind('0.0.0.0', 5758)
@@ -41,14 +42,15 @@ module Diagnose {
         })
         .then(socket.getInfo)
         .then((socketInfo: UdpSocket.SocketInfo) => {
-          Log.debug('listening on %1:%2', socketInfo.localAddress, 
-                    socketInfo.localPort);
+          logger.debug(tag, 'listening on %1:%2', socketInfo.localAddress, 
+                       socketInfo.localPort);
         })
         .then(() => {
           socket.on('onData', onUdpData);
           var pingReq = new Uint32Array(1);
           pingReq[0] = (new Date()).getMilliseconds();
-          Log.info('sent ping request to %1:%2', '199.223.236.121', 3333);
+          logger.info(tag, 'sent ping request to %1:%2',
+                      '199.223.236.121', 3333);
           socket.sendTo(pingReq.buffer, '199.223.236.121', 3333);
         });
   }
@@ -68,7 +70,20 @@ module Diagnose {
   }
 
   function pingStunServer(serverAddr: string) {
+    var socket:UdpSocket = freedom['core.udpsocket']();
+    var parts = serverAddr.split(':');
+    var start = (new Date()).getMilliseconds();
 
+    function onStunDataBack(info: UdpSocket.RecvFromInfo) {
+      var response = new Uint32Array(info.data);
+      logger.info(tag, 'Response received with latency=%1ms',
+                  (new Date()).getMilliseconds() - start);
+    }
+
+    var request = new ArrayBuffer(20);
+    var bufView = new Uint8Array(request);
+    
+    socket.sendTo(request, parts[0], parts[1]);
   }
 
 }
