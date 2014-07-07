@@ -17,6 +17,12 @@ module Diagnose {
     }
   });
 
+  freedom.on('getLogs', function() {
+    logger.getLogs().then(function(str) {
+      freedom.emit('print', str);
+    });
+  });
+
   function print(m: any) {
     freedom.emit('print', m);
   }
