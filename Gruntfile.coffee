@@ -17,14 +17,16 @@ module.exports = (grunt) ->
         src: ['*']
         dest: 'build/chrome-app/freedom-providers' } ] }
 
+      buildToolsBuild: { files: [ {
+          expand: true, cwd: 'node_modules/uproxy-build-tools/build',
+          src: ['**'],
+          dest: 'build'
+        } ] }
+
       # User should include the compiled source directly from:
       diagnose: { files: [ {
         expand: true, cwd: 'src/'
         src: ['diagnose/**/*.json']
-        dest: 'build/' } ] }
-      logger: { files: [ {
-        expand: true, cwd: 'src/'
-        src: ['logger/**/*.json', '**/*.js']
         dest: 'build/' } ] }
       pidCrypt: { files: [ {
         expand: true, cwd: 'src/'
@@ -58,14 +60,6 @@ module.exports = (grunt) ->
     typescript: {
       diagnose:
         src: ['src/diagnose/**/*.ts']
-        dest: 'build/'
-        options: { basePath: 'src', ignoreError: false }
-      logger:
-        src: ['src/logger/**/*.ts']
-        dest: 'build/'
-        options: { basePath: 'src', ignoreError: false }
-      common:
-        src: ['src/common/**/*.ts']
         dest: 'build/'
         options: { basePath: 'src', ignoreError: false }
       chromeApp:
@@ -102,20 +96,17 @@ module.exports = (grunt) ->
 
   taskManager.add 'build', [
     'typescript:diagnose'
-    'typescript:logger'
-    'typescript:common'
     'typescript:chromeApp'
     'copy:freedomChrome'
     'copy:freedomProvidersChrome'
+    'copy:buildToolsBuild'
     'copy:diagnose'
-    'copy:logger'
     'copy:pidCrypt'
     'copy:chromeApp'
   ]
 
   taskManager.add 'test', [
     'build'
-    'jasmine:logger'
   ]
 
   taskManager.add 'default', [
