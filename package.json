@@ -14,7 +14,7 @@
     "grunt-contrib-copy": "^0.5.0",
     "grunt-typescript": "^0.3.0",
     "grunt-env": "^0.4.1",
-    "uproxy-build-tools": "~0.0.4",
+    "uproxy-build-tools": "~0.1.0",
     "freedom-for-chrome": "~0.2.0",
     "freedom-typescript-api": "~0.1.9",
     "freedom": "~0.5.0",
