@@ -6,7 +6,7 @@
   "app": {
     "background": {
       "scripts": ["background.js", "uprobe.js", "logencrypt.js",
-      "pidCrypt/pidcrypt.js", "pidCrypt/pidcrypt_util.js"]
+      "third_party/pidCrypt/pidcrypt.js", "third_party/pidCrypt/pidcrypt_util.js"]
     }
   },
   "sockets": {

@@ -1,7 +1,7 @@
-/// <reference path='../../node_modules/freedom-typescript-api/interfaces/freedom.d.ts' />
-/// <reference path='../../node_modules/freedom-typescript-api/interfaces/promise.d.ts' />
-/// <reference path='../../node_modules/uproxy-build-tools/src/logger/logger.d.ts' />
-/// <reference path='../../node_modules/freedom-typescript-api/interfaces/udp-socket.d.ts' />
+/// <reference path='../freedom-typescript-api/interfaces/freedom.d.ts' />
+/// <reference path='../freedom-typescript-api/interfaces/promise.d.ts' />
+/// <reference path='../logger/logger.d.ts' />
+/// <reference path='../freedom-typescript-api/interfaces/udp-socket.d.ts' />
 
 module Diagnose {
   import UdpSocket = freedom.UdpSocket;

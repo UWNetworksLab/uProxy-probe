@@ -1,84 +1,129 @@
-TaskManager = require './node_modules/uproxy-build-tools/build/taskmanager/taskmanager'
+TaskManager = require 'uproxy-build-tools/build/taskmanager/taskmanager'
+
+#-------------------------------------------------------------------------
+# Rule-making helper function that assume expected directory layout.
+#
+# Function to make a copy rule for a module directory, assuming standard
+# layout. Copies all non (ts/sass) compiled files into the corresponding
+# build directory.
+Rule = require('uproxy-build-tools/Gruntfile.coffee').Rule;
+
+# Copy all source that is not typescript to the module's build directory.
+Rule.copySrcModule = (name, dest) ->
+  expand: true, cwd: 'src/'
+  src: [name + '/**', '!' + name + '/**/*.ts', '!' + name + '/**/*.sass']
+  dest: 'build'
+  onlyIf: 'modified'
+
+# Copy all libraries (but not samples and typescript src) into the desitination
+# directory (typically a sample app)
+Rule.copyAllModulesTo = (dest) ->
+  files: [
+    {  # Copy all modules in the build directory to the sample
+      expand: true, cwd: 'build'
+      src: ['**/*', '!samples/**', '!typescript-src/**',
+            '!samples', '!typescript-src']
+      dest: 'build/' + dest
+      onlyIf: 'modified'
+    }
+    {  # Useful to support the map files
+      expand: true, cwd: 'build'
+      src: ['typescript-src/**/*']
+      dest: 'build/' + dest
+      onlyIf: 'modified'
+    }
+  ]
+
+# HACK: this overrides Rule's |noImplicitAny=false| to deal with inability to
+# refer to `core.XXX` providers as members in JavaScript. See:
+# https://github.com/freedomjs/freedom/issues/57
+Rule.typeScriptSrc = (name) ->
+  src: ['build/typescript-src/' + name + '/**/*.ts', '!**/*.d.ts']
+  dest: 'build/'
+  options:
+    basePath: 'build/typescript-src/'
+    ignoreError: false
+    noImplicitAny: false
+    sourceMap: true
+
 
 module.exports = (grunt) ->
-
   path = require('path');
 
   grunt.initConfig {
     pkg: grunt.file.readJSON('package.json')
 
     copy: {
-      freedomChrome: { files: [ {
-        expand: true, cwd: 'node_modules/freedom-for-chrome/'
-        src: ['freedom-for-chrome.js']
-        dest: 'build/chrome-app/' } ] }
-      freedomProvidersChrome: { files: [ {
-        expand: true, cwd: 'node_modules/freedom/providers/transport/webrtc/'
-        src: ['*']
-        dest: 'build/chrome-app/freedom-providers' } ] }
-
       buildToolsBuild: { files: [ {
-          expand: true, cwd: 'node_modules/uproxy-build-tools/build',
-          src: ['**'],
+          expand: true, cwd: 'node_modules/uproxy-build-tools/build'
+          src: ['**']
           dest: 'build'
+          onlyIf: 'modified'
         } ] }
 
-      # User should include the compiled source directly from:
-      diagnose: { files: [ {
-        expand: true, cwd: 'src/'
-        src: ['diagnose/**/*.json']
-        dest: 'build/' } ] }
-      pidCrypt: { files: [ {
-        expand: true, cwd: 'src/'
-        src: ['pidCrypt/**/*.js']
-        dest: 'build/' } ] }
-      chromeApp: { files: [ {
-          expand: true, cwd: 'src/chrome-app'
-          src: ['**/*.json', '**/*.js', '**/*.html', '**/*.css']
-          dest: 'build/chrome-app/'
-        }, {
-          expand: true, cwd: 'build/diagnose',
-          src: ['**/*.js', '**/*.json'],
-          dest: 'build/chrome-app/diagnose'
-        }, {
-          expand: true, cwd: 'build/logger',
-          src: ['**/*.js', '**/*.json'],
-          dest: 'build/chrome-app/logger'
-        }, {
-          expand: true, cwd: 'build/pidCrypt',
-          src: ['**/*.js', '**/*.json'],
-          dest: 'build/chrome-app/pidCrypt'
-        }, {
-          expand: true, cwd: 'build/common',
-          src: ['**/*.js'],
-          dest: 'build/chrome-app/common'
+      freedomForChrome: { files: [ {
+          expand: true, cwd: 'node_modules/freedom-for-chrome/'
+          src: ['freedom-for-chrome.js']
+          dest: 'build' 
+          onlyIf: 'modified'
         } ] }
-    }
+
+      freedomProviders: { files: [ {
+          expand: true, cwd: 'node_modules/freedom/providers/transport/webrtc/'
+          src: ['**']
+          dest: 'build/freedom-providers' 
+          onlyIf: 'modified'
+        } ] }
+
+      # Copy any JavaScript from the third_party directory
+      thirdPartyJavaScript: { files: [ {
+          expand: true,
+          src: ['third_party/**/*.js']
+          dest: 'build/'
+          onlyIf: 'modified'
+        } ] }
+
+      thirdPartyTypeScript: { files: [
+          # Copy any typescript from the third_party directory
+          {
+            expand: true,
+            src: ['third_party/**/*.ts']
+            dest: 'build/typescript-src/'
+            onlyIf: 'modified'
+          },
+          # freedom-typescript-api interfaces.
+          {
+            expand: true, cwd: 'node_modules/freedom-typescript-api'
+            src: ['interfaces/**/*.ts']
+            dest: 'build/typescript-src/freedom-typescript-api/'
+            onlyIf: 'modified'
+          }
+        ]}
+
+      # All module's typescript should be in the standard place for all
+      # typescript code: build/typescript-src/
+      typeScriptSrc: { files: [ {
+          expand: true, cwd: 'src/'
+          src: ['**/*.ts']
+          dest: 'build/typescript-src/' 
+        } ] }
+
+      # Individual modules.
+      diagnose: Rule.copySrcModule 'diagnose'
+      chromeApp: Rule.copySrcModule 'chrome-app'
+      libForChromeApp: Rule.copyAllModulesTo 'chrome-app'
+    }  # copy
 
     #-------------------------------------------------------------------------
-    # All typescript compiles to build/ initially.
+    # All typescript compiles to locations in `build/`
     typescript: {
-      diagnose:
-        src: ['src/diagnose/**/*.ts']
-        dest: 'build/'
-        options: { basePath: 'src', ignoreError: false }
-      chromeApp:
-        src: ['src/chrome-app/**/*.ts']
-        dest: 'build/'
-        options: { basePath: 'src/', ignoreError: false }
-    }
-
-    jasmine: {
-      logger:
-        src: [
-          'node_modules/es6-promise/dist/promise-*.js',
-          '!node_modules/es6-promise/dist/promise-*amd.js',
-          '!node_modules/es6-promise/dist/promise-*.min.js',
-          'build/chrome-app/logger/mocks.js',
-          'build/chrome-app/logger/logger.js'
-          ]
-        options: { specs: 'build/logger/**/*.spec.js'}
-    }
+      # From build-tools
+      arraybuffers: Rule.typeScriptSrc 'arraybuffers'
+      logger: Rule.typeScriptSrc 'logger'
+      # Modules
+      diagnose: Rule.typeScriptSrc 'diagnose'
+      # chromeApp: Rule.typeScriptSrc 'chrome-app'
+    } # typescript
 
     clean: ['build/**']
   }  # grunt.initConfig
@@ -88,21 +133,40 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-typescript'
   grunt.loadNpmTasks 'grunt-env'
-  grunt.loadNpmTasks 'grunt-contrib-jasmine'
 
   #-------------------------------------------------------------------------
   # Define the tasks
   taskManager = new TaskManager.Manager();
 
-  taskManager.add 'build', [
-    'typescript:diagnose'
-    'typescript:chromeApp'
-    'copy:freedomChrome'
-    'copy:freedomProvidersChrome'
-    'copy:buildToolsBuild'
+  taskManager.add 'copyModulesSrc', [
     'copy:diagnose'
-    'copy:pidCrypt'
+  ]
+
+  taskManager.add 'base', [
+    'copy:buildToolsBuild'
+    'copy:thirdPartyTypeScript'
+    'copy:typeScriptSrc'
+    'copy:thirdPartyJavaScript'
+    'copy:freedomProviders'
+    'copy:freedomForChrome'
     'copy:chromeApp'
+
+    # Copy all source modules non-ts files
+    'copyModulesSrc'
+  ]
+
+  taskManager.add 'diagnose', [
+    'base'
+    'typescript:diagnose'
+    'copy:chromeApp'
+    'copy:libForChromeApp'
+  ]
+
+  #-------------------------------------------------------------------------
+  taskManager.add 'build', [
+    'base'
+    # Modules in uprobe
+    'diagnose'
   ]
 
   taskManager.add 'test', [
@@ -118,3 +182,6 @@ module.exports = (grunt) ->
   taskManager.list().forEach((taskName) =>
     grunt.registerTask taskName, (taskManager.get taskName)
   );
+
+module.exports.Rule = Rule;
+
