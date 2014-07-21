@@ -1,4 +1,4 @@
-TaskManager = require 'uproxy-build-tools/build/taskmanager/taskmanager'
+TaskManager = require 'uproxy-lib/build/taskmanager/taskmanager'
 
 #-------------------------------------------------------------------------
 # Rule-making helper function that assume expected directory layout.
@@ -6,7 +6,7 @@ TaskManager = require 'uproxy-build-tools/build/taskmanager/taskmanager'
 # Function to make a copy rule for a module directory, assuming standard
 # layout. Copies all non (ts/sass) compiled files into the corresponding
 # build directory.
-Rule = require('uproxy-build-tools/Gruntfile.coffee').Rule;
+Rule = require('uproxy-lib/Gruntfile.coffee').Rule;
 
 # Copy all source that is not typescript to the module's build directory.
 Rule.copySrcModule = (name, dest) ->
@@ -22,7 +22,7 @@ Rule.copyAllModulesTo = (dest) ->
     {  # Copy all modules in the build directory to the sample
       expand: true, cwd: 'build'
       src: ['**/*', '!samples/**', '!typescript-src/**',
-            '!samples', '!typescript-src']
+            '!samples', '!typescript-src', '!chrome-app']
       dest: 'build/' + dest
       onlyIf: 'modified'
     }
@@ -54,8 +54,8 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON('package.json')
 
     copy: {
-      buildToolsBuild: { files: [ {
-          expand: true, cwd: 'node_modules/uproxy-build-tools/build'
+      uproxyLib: { files: [ {
+          expand: true, cwd: 'node_modules/uproxy-lib/build'
           src: ['**']
           dest: 'build'
           onlyIf: 'modified'
@@ -64,7 +64,7 @@ module.exports = (grunt) ->
       freedomForChrome: { files: [ {
           expand: true, cwd: 'node_modules/freedom-for-chrome/'
           src: ['freedom-for-chrome.js']
-          dest: 'build' 
+          dest: 'build/freedom-for-chrome' 
           onlyIf: 'modified'
         } ] }
 
@@ -76,10 +76,9 @@ module.exports = (grunt) ->
         } ] }
 
       # Copy any JavaScript from the third_party directory
-      thirdPartyJavaScript: { files: [ {
-          expand: true,
-          src: ['third_party/**/*.js']
-          dest: 'build/'
+      e2eCompiledJavaScript: { files: [ {
+          src: ['end-to-end.build/build/library/end-to-end.compiled.js']
+          dest: 'build/chrome-app/end-to-end.compiled.js'
           onlyIf: 'modified'
         } ] }
 
@@ -122,7 +121,7 @@ module.exports = (grunt) ->
       logger: Rule.typeScriptSrc 'logger'
       # Modules
       diagnose: Rule.typeScriptSrc 'diagnose'
-      # chromeApp: Rule.typeScriptSrc 'chrome-app'
+      chromeApp: Rule.typeScriptSrc 'chrome-app'
     } # typescript
 
     clean: ['build/**']
@@ -143,21 +142,23 @@ module.exports = (grunt) ->
   ]
 
   taskManager.add 'base', [
-    'copy:buildToolsBuild'
+    'copy:uproxyLib'
     'copy:thirdPartyTypeScript'
     'copy:typeScriptSrc'
-    'copy:thirdPartyJavaScript'
+    'copy:e2eCompiledJavaScript'
     'copy:freedomProviders'
     'copy:freedomForChrome'
     'copy:chromeApp'
 
     # Copy all source modules non-ts files
     'copyModulesSrc'
+
   ]
 
   taskManager.add 'diagnose', [
     'base'
     'typescript:diagnose'
+    'typescript:chromeApp'
     'copy:chromeApp'
     'copy:libForChromeApp'
   ]
