@@ -1,7 +1,7 @@
-uProbe
+uproxy-probe
 =========
 
-uProbe is a testing app to diagnose uProxy connection process in case of failure.
+uproxy-probe is a testing app to diagnose uProxy connection process in case of failure.
 
 This is built on top of [freedom](https://github.com/UWNetworksLab/freedom).
 
@@ -9,7 +9,7 @@ At the moment this only supports chrome.
 
 ### Overview
 
-uProbe itself is implemented as a Chrome App. Most of the work is done in freedom module Diagnose.
+Probe itself is implemented as a Chrome App. Most of the work is done in freedom module Diagnose.
 
 #### Requirements
 
@@ -30,6 +30,14 @@ Install this app to Chrome.
  - run Jasmine tests with `grunt test`
 
 ### End-to-End Test
+
+- end-to-end code is brought in through following command run in uproxy-probe root directory.
+  git clone https://code.google.com/p/end-to-end/
+  
+  Before start grunt, please run following to build end-to-end
+  cd end-to-end.build/
+  ./do.sh install_deps
+  ./do.sh build_library  
 
 #### Requirements
 
