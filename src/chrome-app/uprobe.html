@@ -2,20 +2,16 @@
 <html>
   <head>
     <title>diagnosis</title>
-    <script src='freedom-for-chrome.js' data-manifest='diagnose/diagnose.json'>
+    <script src='freedom-for-chrome/freedom-for-chrome.js' data-manifest='diagnose/diagnose.json'>
       {
         "stayLocal": true,
         "debug": true,
         "strongIsolation": true
       }
     </script>
-    <SCRIPT src="third_party/pidCrypt/pidcrypt.js"></SCRIPT>
-    <SCRIPT src="third_party/pidCrypt/pidcrypt_util.js"></SCRIPT>
-    <SCRIPT src="third_party/pidCrypt/asn1.js"></SCRIPT><!--needed for parsing decrypted rsa certificate-->
-    <SCRIPT src="third_party/pidCrypt/jsbn.js"></SCRIPT><!--needed for rsa math operations-->
-    <SCRIPT src="third_party/pidCrypt/rng.js"></SCRIPT><!--needed for rsa key generation-->
-    <SCRIPT src="third_party/pidCrypt/prng4.js"></SCRIPT><!--needed for rsa key generation-->
-    <SCRIPT src="third_party/pidCrypt/rsa.js"></SCRIPT><!--needed for rsa en-/decryption-->
+    <script src="arraybuffers/arraybuffers.js"></script>
+    <script src='end-to-end.compiled.js'></script>
+    <script src='googstorage.js'></script>
     <script src='logencrypt.js'></script>
     <script src='uprobe.js'></script>
   </head>

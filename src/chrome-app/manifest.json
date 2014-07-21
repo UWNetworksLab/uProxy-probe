@@ -5,8 +5,10 @@
   "version": "0.0.1",
   "app": {
     "background": {
-      "scripts": ["background.js", "uprobe.js", "logencrypt.js",
-      "third_party/pidCrypt/pidcrypt.js", "third_party/pidCrypt/pidcrypt_util.js"]
+      "scripts": [
+        "background.js", "uprobe.js", "logencrypt.js",
+        "end-to-end.compiled.js"
+      ]
     }
   },
   "sockets": {

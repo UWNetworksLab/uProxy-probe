@@ -7,38 +7,20 @@ window.onload = function() {
 
   button.onclick = function(e) {
     window.freedom.emit('getLogs');
+    check();
   };
 
   outputLine('uProbe started');
-  // logger.debug('uprobe', 'perform send_udp test');
-  // logger.info('uprobe', 'send_udp test');
+  // freedom.emit('command', 'send_udp');
 
-  freedom.emit('command', 'send_udp');
-
-  testRsaEncryption();
+  pgpEncrypt.setup();
+  pgpEncrypt.testPgpEncryption('asdfasdf').then(function(result) {
+    if (result) {
+      outputLine('pgp encryption test succeeded.');
+    } else {
+      outputLine('pgp encryption test failed.');
+    } });
 }
-
-
-
-function testRsaEncryption() {
-  var start = new Date();  // timer
-  var result = encrypt('plain text test data...');
-  if (result) {
-    outputLine('encryption took ' + ((new Date()) - start) + ' ms');
-  } else {
-    outputLine('encrypt failed, mostly because invalid key.');
-  }
-  outputLine(result);
-
-  start = new Date();  // timer
-  result = decrypt(result);
-  if (result) {
-    outputLine('decryption took ' + ((new Date()) - start) + ' ms');
-  } else {
-    outputLine('decrypt failed, mostly because invalid key.');
-  }
-  outputLine(result);
-};
 
 function outputLine(msg) {
   var logDiv = document.getElementById('log');
