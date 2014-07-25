@@ -32,7 +32,7 @@ Install this app to Chrome.
 ### End-to-End Test
 
 - end-to-end code is brought in through following command run in uproxy-probe root directory.
-  git clone https://code.google.com/p/end-to-end/
+  git clone https://code.google.com/p/end-to-end.build/
   
   Before start grunt, please run following to build end-to-end
   cd end-to-end.build/
