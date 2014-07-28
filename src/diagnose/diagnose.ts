@@ -14,12 +14,15 @@ module Diagnose {
     if (m == 'send_udp') {
       doUdpTest();
     } else if (m == 'stun_access') {
+      doStunAccessTest();
     }
   });
 
   freedom.on('getLogs', function() {
     logger.getLogs().then(function(str) {
       freedom.emit('print', str);
+    }).then(() => {
+      logger.reset();
     });
   });
 
@@ -33,9 +36,14 @@ module Diagnose {
 
     function onUdpData(info: UdpSocket.RecvFromInfo) {
       var response = new Uint32Array(info.data);
-      logger.info(tag, 'Ping response received from %1:%2, latency=%3ms',
-                  info.address, info.port,
-                  (new Date()).getMilliseconds() - response[0]);
+      var d = new Date();
+      var laterncy = d.getSeconds() * 1000 + d.getMilliseconds() - response[0];
+      if (laterncy < 0) {
+        laterncy += 60 * 1000;
+      }
+      print('Ping response received from ' +
+            info.address + ':' + info.port +
+            ', latency=' + laterncy + 'ms');
     }   
 
     socket.bind('0.0.0.0', 5758)
@@ -54,7 +62,8 @@ module Diagnose {
         .then(() => {
           socket.on('onData', onUdpData);
           var pingReq = new Uint32Array(1);
-          pingReq[0] = (new Date()).getMilliseconds();
+          var d = new Date();
+          pingReq[0] = d.getSeconds() * 1000 + d.getMilliseconds();
           logger.info(tag, 'sent ping request to %1:%2',
                       '199.223.236.121', 3333);
           socket.sendTo(pingReq.buffer, '199.223.236.121', 3333);
@@ -69,27 +78,77 @@ module Diagnose {
     'stun:stun4.l.google.com:19302',
   ];
 
-  export function doStunAccessTest() {
+  function doStunAccessTest() {
+    //for (var i = 0; i < 1; i++) {
     for (var i = 0; i < stunServers.length; i++) {
-      pingStunServer(stunServers[i]);
+      var promises = [];
+      for (var j = 0; j < 5; j++) {
+        promises.push(pingStunServer(stunServers[i]));
+      }
+      Promise.all(promises).then((laterncies: Array<number>) => {
+        var server = stunServers[i];
+        var total = 0;
+        for (var k = 0; k < laterncies.length; k++) {
+          total += laterncies[k];
+        }
+        print('Average laterncy for ' + stunServers[i] +
+              ' = ' + total / laterncies.length);
+      });
     }
   }
 
   function pingStunServer(serverAddr: string) {
-    var socket:UdpSocket = freedom['core.udpsocket']();
-    var parts = serverAddr.split(':');
-    var start = (new Date()).getMilliseconds();
+    return new Promise<number>( (F, R) => {
+      var socket:UdpSocket = freedom['core.udpsocket']();
+      var parts = serverAddr.split(':');
+      var start = Date.now();
 
-    function onStunDataBack(info: UdpSocket.RecvFromInfo) {
-      var response = new Uint32Array(info.data);
-      logger.info(tag, 'Response received with latency=%1ms',
-                  (new Date()).getMilliseconds() - start);
-    }
+      var bindRequest = {
+        method: Turn.MessageMethod.BIND,
+        clazz:  Turn.MessageClass.REQUEST,
+        transactionId: new Uint8Array(12),
+        attributes: []
+      };
 
-    var request = new ArrayBuffer(20);
-    var bufView = new Uint8Array(request);
-    
-    socket.sendTo(request, parts[0], parts[1]);
+      var uint16View = new Uint16Array(bindRequest.transactionId);
+      for (var i = 0; i < 6; i++) {
+        uint16View[i] = Math.floor(Math.random() * 65535);
+      }
+
+      socket.on('onData', (info: UdpSocket.RecvFromInfo) => {
+        try {
+          var response = Turn.parseStunMessage(new Uint8Array(info.data));
+        } catch (e) {
+          logger.error(tag, 'Failed to parse bind request from %1', serverAddr);
+          R(e);
+          return;
+        }
+        var attribute = Turn.findFirstAttributeWithType(
+            Turn.MessageAttribute.XOR_MAPPED_ADDRESS, response.attributes);
+        var endPoint = Turn.parseXorMappedAddressAttribute(attribute.value);
+        var laterncy = Date.now() - start;
+        print(serverAddr + ' returned in ' + laterncy + 'ms. ' +
+              'report reflexive address: ' + JSON.stringify(endPoint));
+        F(laterncy);
+      });
+
+      var bytes = Turn.formatStunMessage(bindRequest);
+      socket.bind('0.0.0.0', 0)
+          .then((result: number) => {
+            if (result != 0) {
+              return Promise.reject(new Error('listen failed to bind :5758' +
+                  ' with result code ' + result));
+            }
+            return Promise.resolve(result);
+          }).then(() => {
+            return socket.sendTo(bytes.buffer, parts[1], parseInt(parts[2]));
+          }).then((written: number) => {
+              logger.debug(tag, '%1 bytes sent correctly', written);
+          }).catch((e) => {
+              logger.debug(tag, JSON.stringify(e));
+              R(e);
+          })
+    });
   }
 
 }

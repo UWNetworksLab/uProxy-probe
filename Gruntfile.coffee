@@ -75,6 +75,13 @@ module.exports = (grunt) ->
           onlyIf: 'modified'
         } ] }
 
+      crypto: { files: [ {
+          expand: true, cwd: 'node_modules/crypto/'
+          src: ['**']
+          dest: 'build/crypto' 
+          onlyIf: 'modified'
+        } ] }
+
       # Copy any JavaScript from the third_party directory
       e2eCompiledJavaScript: { files: [ {
           src: ['end-to-end.build/build/library/end-to-end.compiled.js']
@@ -149,6 +156,7 @@ module.exports = (grunt) ->
     'copy:freedomProviders'
     'copy:freedomForChrome'
     'copy:chromeApp'
+    'copy:crypto'
 
     # Copy all source modules non-ts files
     'copyModulesSrc'
