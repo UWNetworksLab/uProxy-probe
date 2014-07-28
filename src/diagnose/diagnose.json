@@ -3,7 +3,7 @@
   "description": "Diagnose Freedom manifest",
   "app": {
     "script": [
-      "diagnose.js"
+      "diagnose.js", "messages.js"
     ]
   },
   "dependencies": {
