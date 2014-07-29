@@ -1,19 +1,14 @@
 /// <reference path='../freedom-typescript-api/interfaces/freedom.d.ts' />
 /// <reference path='../freedom-typescript-api/interfaces/promise.d.ts' />
 
-
-interface Func<T, R> {
-    (item: T) : R;
-}
-
 interface DecryptResult {
   decrypt : { data: number[];} ;
 }
 
 declare module e2e.async {
   class Result<T> {
-    addCallback(f: Func<T, void>) : void;
-    addErrback(f: Func<T, void>) : void;
+    addCallback(f: (T) => void) : void;
+    addErrback(f: (T) => void) : void;
 
     // TODO: how to replace any?
     //static getValue(result: Result<T>) : T;
@@ -23,17 +18,19 @@ declare module e2e.async {
 
 declare module e2e.openpgp {
   interface PassphraseCallbackFunc {
-    (str: string, f: Func<string, void>) : void;
+    (str: string, f: (string) => void) : void;
   }
 
   class ContextImpl {
     setKeyRingPassphrase(passphrase: string) : void;
 
     importKey(passphraseCallback: PassphraseCallbackFunc,
-              keyStr: string) : e2e.async.Result<void>;
+              keyStr: string) : e2e.async.Result<string[]>;
 
     // We don't need to know how key is being represented, thus use any here.
     searchPublicKey(uid: string) : e2e.async.Result<any[]>;
+
+    searchPrivateKey(uid: string) : e2e.async.Result<any[]>;
 
     encryptSign(plaintext: string, options: any [], keys: any [], 
                 passphrase: string) : e2e.async.Result<string>;
@@ -94,7 +91,15 @@ module pgpEncrypt {
     // this function has the side-effect to setup the keyright storage. 
     pgpContext.setKeyRingPassphrase('');
 
-    var t = pgpContext.importKey((str, f) => { f(''); }, privateKeyStr);
+    pgpContext.importKey((str, f) => { f(''); }, privateKeyStr);
+  }
+
+  export function testKeyring() : Promise<boolean> {
+    return importKey(privateKeyStr).then((keys: string[]) : Promise<any[]> => {
+      return searchPrivateKey('<quantsword@gmail.com>');
+    }).then((foundKeys: any[]) => {
+      return foundKeys.length > 0;
+    });
   }
 
   export function testPgpEncryption(plaintext) : Promise<boolean> {
@@ -109,6 +114,18 @@ module pgpEncrypt {
     .then(function(str) {
         return str == plaintext;
       });
+  }
+
+  export function importKey(keyStr: string) : Promise<string[]> {
+    return new Promise(function(F, R) {
+      pgpContext.importKey((str, f) => { f(''); }, keyStr).addCallback(F);
+    });
+  }
+
+  export function searchPrivateKey(uid: string) : Promise<any[]> {
+    return new Promise(function(F, R) {
+      pgpContext.searchPrivateKey(uid).addCallback(F);
+    });
   }
 
   export function doEncryption(plaintext) : Promise<string> {

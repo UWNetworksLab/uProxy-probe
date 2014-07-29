@@ -21,14 +21,7 @@ Rule.copyAllModulesTo = (dest) ->
   files: [
     {  # Copy all modules in the build directory to the sample
       expand: true, cwd: 'build'
-      src: ['**/*', '!samples/**', '!typescript-src/**',
-            '!samples', '!typescript-src', '!chrome-app']
-      dest: 'build/' + dest
-      onlyIf: 'modified'
-    }
-    {  # Useful to support the map files
-      expand: true, cwd: 'build'
-      src: ['typescript-src/**/*']
+      src: ['**/*', '!typescript-src/**', '!chrome-app/**']
       dest: 'build/' + dest
       onlyIf: 'modified'
     }

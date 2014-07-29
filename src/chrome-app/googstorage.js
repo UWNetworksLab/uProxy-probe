@@ -1,18 +1,31 @@
+
 function store () {
-  this.storage = {};
+  //this.freedomStorage = freedom['core.storage']();
+  this.memStorage = {};
 }
 
 store.prototype.set = function(key, val) {
-  if (val === undefined) { delete this.storage[key]; return val;}
-  this.storage[key] = val;
+  if (val === undefined) { 
+    //this.freedomStorage.remove(key);
+    delete this.memStorage[key];
+    return val;
+  }
+  //this.freedomStorage.set(key, val);
+  this.memStorage[key] = val;
   return val
 };
 
-store.prototype.get = function(key) { return this.storage[key]; };
+store.prototype.get = function(key) { return this.memStorage[key]; };
 
-store.prototype.remove = function(key) { delete this.storage[key];};
+store.prototype.remove = function(key) { 
+  delete this.memStorage[key];
+  //this.freedomStorage.remove(key);
+};
 
-store.prototype.clear = function() { this.storage = {}; };
+store.prototype.clear = function() {
+  this.memStorage = {};
+  //this.freedomeStorage.clear();
+};
 
 store.prototype.transact = function(key, defaultVal, transactionFn) {
   var val = this.store.get(key)
@@ -44,3 +57,5 @@ store.prototype.deserialize = function(value) {
 };
 
 goog.storage.mechanism.HTML5LocalStorage = store;
+
+

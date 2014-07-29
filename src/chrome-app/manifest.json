@@ -18,6 +18,7 @@
     } 
   },
   "permissions": [
+    "storage",
     { "socket": ["tcp-connect", "tcp-listen", "udp-bind", "udp-send-to"] }
   ]
 }

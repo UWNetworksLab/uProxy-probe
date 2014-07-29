@@ -1,6 +1,3 @@
-// Listen for the DOM content to be loaded. This event is fired when parsing of
-// the page's document has finished.
-//document.addEventListener('DOMContentLoaded', function() {
 
 window.onload = function() {
   var button = document.getElementById('get-log-btn');
@@ -9,6 +6,7 @@ window.onload = function() {
     window.freedom.emit('getLogs');
   };
 
+  /*
   printToPage('============ Udp send test ============');
   freedom.emit('command', 'send_udp');
 
@@ -16,7 +14,7 @@ window.onload = function() {
     printToPage('============ Stun server access test ============')
     freedom.emit('command', 'stun_access');
   }, 3000);
-
+  */
   window.setTimeout(function() {
     printToPage('============ Log encryption test with e2e ============')
     pgpEncrypt.setup();
@@ -26,7 +24,12 @@ window.onload = function() {
       } else {
         printToPage('pgp encryption test failed.');
       } });
-  }, 10000);
+
+    pgpEncrypt.testKeyring().then(function(result) {
+      printToPage('PGP keyring test succeeded.');
+    });
+
+  }, 0);
 }
 
 function printToPage(msg) {
