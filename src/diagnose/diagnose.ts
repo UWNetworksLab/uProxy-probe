@@ -6,7 +6,6 @@
 module Diagnose {
   import UdpSocket = freedom.UdpSocket;
   var logger = freedom['Logger']();
-
   var tag = 'Diagnose';
 
   freedom.on('command', function(m) {
@@ -15,6 +14,8 @@ module Diagnose {
       doUdpTest();
     } else if (m == 'stun_access') {
       doStunAccessTest();
+    } else if (m == 'pgp_test') {
+      doPgpTest();
     }
   });
 
@@ -151,5 +152,21 @@ module Diagnose {
     });
   }
 
+  function doPgpTest() {
+    logger.debug(tag, 'start doPgpTest');
+
+    pgpEncrypt.setup().then(() => {
+      pgpEncrypt.testPgpEncryption('asdfasdf').then(function(result) {
+        if (result) {
+          print('pgp encryption test succeeded.');
+        } else {
+          print('pgp encryption test failed.');
+        } });
+
+      pgpEncrypt.testKeyring().then(function(result) {
+        print('PGP keyring test succeeded.');
+      });
+    });
+  }
 }
 

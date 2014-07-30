@@ -10,10 +10,14 @@ declare module e2e.async {
     addCallback(f: (T) => void) : void;
     addErrback(f: (T) => void) : void;
 
-    // TODO: how to replace any?
+    // TODO: how to replace any? static member can not reference 'T'.
     //static getValue(result: Result<T>) : T;
     static getValue(result: any) : any;
   }
+}
+
+declare module goog.storage.mechanism.HTML5LocalStorage {
+  function prepareFreedom() : Promise<void>;
 }
 
 declare module e2e.openpgp {
@@ -87,11 +91,11 @@ module pgpEncrypt {
 
   var pgpContext: e2e.openpgp.ContextImpl = new e2e.openpgp.ContextImpl();
 
-  export function setup() : void {
-    // this function has the side-effect to setup the keyright storage. 
-    pgpContext.setKeyRingPassphrase('');
-
-    pgpContext.importKey((str, f) => { f(''); }, privateKeyStr);
+  export function setup() : Promise<void> {
+    return goog.storage.mechanism.HTML5LocalStorage.prepareFreedom().then(() => {
+      // this function has the side-effect to setup the keyright storage. 
+      pgpContext.setKeyRingPassphrase('');
+    });
   }
 
   export function testKeyring() : Promise<boolean> {
@@ -137,8 +141,11 @@ module pgpEncrypt {
   }
 
   export function doDecryption(ciphertext: string) : Promise<DecryptResult> {
+    pgpContext.importKey((str, f) => { f(''); }, privateKeyStr);
     return new Promise(function(F, R) {
-        pgpContext.verifyDecrypt(() : string => { return ''; }, ciphertext).addCallback(F);
+        pgpContext.verifyDecrypt(
+            () => { return ''; }, // passphrase callback
+            ciphertext).addCallback(F);
       });
   }
 

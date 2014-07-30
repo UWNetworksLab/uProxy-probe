@@ -6,7 +6,6 @@ window.onload = function() {
     window.freedom.emit('getLogs');
   };
 
-  /*
   printToPage('============ Udp send test ============');
   freedom.emit('command', 'send_udp');
 
@@ -14,22 +13,11 @@ window.onload = function() {
     printToPage('============ Stun server access test ============')
     freedom.emit('command', 'stun_access');
   }, 3000);
-  */
+
   window.setTimeout(function() {
     printToPage('============ Log encryption test with e2e ============')
-    pgpEncrypt.setup();
-    pgpEncrypt.testPgpEncryption('asdfasdf').then(function(result) {
-      if (result) {
-        printToPage('pgp encryption test succeeded.');
-      } else {
-        printToPage('pgp encryption test failed.');
-      } });
-
-    pgpEncrypt.testKeyring().then(function(result) {
-      printToPage('PGP keyring test succeeded.');
-    });
-
-  }, 0);
+    freedom.emit('command', 'pgp_test');
+  }, 7000);
 }
 
 function printToPage(msg) {

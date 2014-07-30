@@ -78,7 +78,7 @@ module.exports = (grunt) ->
       # Copy any JavaScript from the third_party directory
       e2eCompiledJavaScript: { files: [ {
           src: ['end-to-end.build/build/library/end-to-end.compiled.js']
-          dest: 'build/chrome-app/end-to-end.compiled.js'
+          dest: 'build/diagnose/end-to-end.compiled.js'
           onlyIf: 'modified'
         } ] }
 

@@ -6,8 +6,7 @@
   "app": {
     "background": {
       "scripts": [
-        "background.js", "uprobe.js", "logencrypt.js",
-        "end-to-end.compiled.js"
+        "background.js", "uprobe.js"
       ]
     }
   },

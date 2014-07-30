@@ -3,7 +3,11 @@
   "description": "Diagnose Freedom manifest",
   "app": {
     "script": [
-      "diagnose.js", "messages.js"
+      "end-to-end.compiled.js",
+      "googstorage.js",
+      "logencrypt.js",
+      "messages.js",
+      "diagnose.js" 
     ]
   },
   "dependencies": {
@@ -13,6 +17,7 @@
     }
   },
   "permissions": [
+    "core.storage",
     "core.tcpsocket",
     "core.udpsocket"
   ]
