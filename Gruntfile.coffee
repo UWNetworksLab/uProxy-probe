@@ -1,72 +1,68 @@
-TaskManager = require 'uproxy-lib/build/taskmanager/taskmanager'
-
-#-------------------------------------------------------------------------
-# Rule-making helper function that assume expected directory layout.
-#
-# Function to make a copy rule for a module directory, assuming standard
-# layout. Copies all non (ts/sass) compiled files into the corresponding
-# build directory.
-Rule = require('uproxy-lib/Gruntfile.coffee').Rule;
-
-# Copy all source that is not typescript to the module's build directory.
-Rule.copySrcModule = (name, dest) ->
-  expand: true, cwd: 'src/'
-  src: [name + '/**', '!' + name + '/**/*.ts', '!' + name + '/**/*.sass']
-  dest: 'build'
-  onlyIf: 'modified'
-
-# Copy all libraries (but not samples and typescript src) into the desitination
-# directory (typically a sample app)
-Rule.copyAllModulesTo = (dest) ->
-  files: [
-    {  # Copy all modules in the build directory to the sample
-      expand: true, cwd: 'build'
-      src: ['**/*', '!typescript-src/**', '!chrome-app/**']
-      dest: 'build/' + dest
-      onlyIf: 'modified'
-    }
-  ]
-
-# HACK: this overrides Rule's |noImplicitAny=false| to deal with inability to
-# refer to `core.XXX` providers as members in JavaScript. See:
-# https://github.com/freedomjs/freedom/issues/57
-Rule.typeScriptSrc = (name) ->
-  src: ['build/typescript-src/' + name + '/**/*.ts', '!**/*.d.ts']
-  dest: 'build/'
-  options:
-    basePath: 'build/typescript-src/'
-    ignoreError: false
-    noImplicitAny: false
-    sourceMap: true
-
+TaskManager = require('uproxy-lib/tools/taskmanager');
+Rule = require('uproxy-lib/tools/common-grunt-rules');
 
 module.exports = (grunt) ->
-  path = require('path');
-
+  # path = require('path');
   grunt.initConfig {
     pkg: grunt.file.readJSON('package.json')
 
+    symlink: {
+      typescriptSrc: {
+        files: [ {
+          expand: true,
+          overwrite: true,
+          cwd: 'src',
+          src: ['*'],
+          dest: 'build/typescript-src/'
+        } ]
+      },
+
+      uproxyLibTypescriptSrc: {
+        files: [ {
+          expand: true,
+          overwrite: true,
+          cwd: 'node_modules/uproxy-lib/src/',
+          src: ['*'],
+          dest: 'build/typescript-src/'
+        } ]
+      },
+
+      uproxyLibThirdPartyTypescriptSrc: {
+        overwrite: true,
+        src: 'node_modules/uproxy-lib/third_party/',
+        dest: 'build/typescript-src/third_party/'
+      },
+
+      thirdPartyTypeScript: {
+        files: [
+          # Copy any typescript from the third_party directory
+          {
+            expand: true,
+            overwrite: true,
+            cwd: 'third_party',
+            src: ['*']
+            dest: 'build/typescript-src/'
+          },
+          # freedom-typescript-api interfaces.
+          {
+            expand: true,
+            overwrite: true,
+            cwd: 'node_modules/freedom-typescript-api/interfaces'
+            src: ['*']
+            dest: 'build/typescript-src/freedom-typescript-api/'
+          }
+        ]}
+    },
+
     copy: {
-      uproxyLib: { files: [ {
-          expand: true, cwd: 'node_modules/uproxy-lib/build'
-          src: ['**']
-          dest: 'build'
-          onlyIf: 'modified'
-        } ] }
-
-      freedomForChrome: { files: [ {
-          expand: true, cwd: 'node_modules/freedom-for-chrome/'
-          src: ['freedom-for-chrome.js']
-          dest: 'build/freedom-for-chrome' 
-          onlyIf: 'modified'
-        } ] }
-
-      freedomProviders: { files: [ {
-          expand: true, cwd: 'node_modules/freedom/providers/transport/webrtc/'
-          src: ['**']
-          dest: 'build/freedom-providers' 
-          onlyIf: 'modified'
-        } ] }
+      uproxyLib: {
+        files: [ {
+          expand: true, cwd: 'node_modules/uproxy-lib/build',
+          src: ['**', '!**/typescript-src/**'],
+          dest: 'build',
+          onlyIf: 'modified',
+        } ]
+      },
 
       crypto: { files: [ {
           expand: true, cwd: 'node_modules/crypto/'
@@ -75,6 +71,36 @@ module.exports = (grunt) ->
           onlyIf: 'modified'
         } ] }
 
+      es6Promise: { files: [ {
+          expand: true, cwd: 'node_modules/es6-promise/dist/'
+          src: ['**']
+          dest: 'build/third_party/typings/es6-promise/' 
+          onlyIf: 'modified'
+        } ] }
+
+      chromeAppLib: {
+        files: [
+          {  # Copy all modules in the build directory to the chromeApp
+            expand: true, cwd: 'build'
+            # src: ['**/*', '!typescript-src/**', '!chrome-app/**']
+            src: [
+              'diagnose/**',
+              'arraybuffers/**',
+              'logger/**'
+            ]
+            dest: 'build/chrome-app'
+            onlyIf: 'modified'
+          }
+        ]
+      },
+      chromeAppFreedom: {
+        expand: true,
+        cwd: 'node_modules/uproxy-lib/build/freedom/',
+        src: ['freedom-for-chrome-for-uproxy.js*'],
+        dest: 'build/chrome-app/'
+        onlyIf: 'modified'
+      },
+
       # Copy any JavaScript from the third_party directory
       e2eCompiledJavaScript: { files: [ {
           src: ['end-to-end.build/build/library/end-to-end.compiled.js']
@@ -82,46 +108,22 @@ module.exports = (grunt) ->
           onlyIf: 'modified'
         } ] }
 
-      thirdPartyTypeScript: { files: [
-          # Copy any typescript from the third_party directory
-          {
-            expand: true,
-            src: ['third_party/**/*.ts']
-            dest: 'build/typescript-src/'
-            onlyIf: 'modified'
-          },
-          # freedom-typescript-api interfaces.
-          {
-            expand: true, cwd: 'node_modules/freedom-typescript-api'
-            src: ['interfaces/**/*.ts']
-            dest: 'build/typescript-src/freedom-typescript-api/'
-            onlyIf: 'modified'
-          }
-        ]}
-
-      # All module's typescript should be in the standard place for all
-      # typescript code: build/typescript-src/
-      typeScriptSrc: { files: [ {
-          expand: true, cwd: 'src/'
-          src: ['**/*.ts']
-          dest: 'build/typescript-src/' 
-        } ] }
 
       # Individual modules.
-      diagnose: Rule.copySrcModule 'diagnose'
-      chromeApp: Rule.copySrcModule 'chrome-app'
-      libForChromeApp: Rule.copyAllModulesTo 'chrome-app'
+      diagnose: Rule.copyModule('diagnose')
+      chromeApp: Rule.copyModule('chrome-app')
     }  # copy
 
     #-------------------------------------------------------------------------
     # All typescript compiles to locations in `build/`
     typescript: {
       # From build-tools
-      arraybuffers: Rule.typeScriptSrc 'arraybuffers'
-      logger: Rule.typeScriptSrc 'logger'
+      arraybuffers: Rule.typescriptSrc('arraybuffers')
+      logger: Rule.typescriptSrc('logger')
+
       # Modules
-      diagnose: Rule.typeScriptSrc 'diagnose'
-      chromeApp: Rule.typeScriptSrc 'chrome-app'
+      diagnose: Rule.typescriptSrc('diagnose')
+      chromeApp: Rule.typescriptSrc('chrome-app')
     } # typescript
 
     clean: ['build/**']
@@ -132,36 +134,34 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-typescript'
   grunt.loadNpmTasks 'grunt-env'
+  grunt.loadNpmTasks 'grunt-contrib-symlink'
 
   #-------------------------------------------------------------------------
   # Define the tasks
   taskManager = new TaskManager.Manager();
 
-  taskManager.add 'copyModulesSrc', [
-    'copy:diagnose'
-  ]
-
   taskManager.add 'base', [
-    'copy:uproxyLib'
-    'copy:thirdPartyTypeScript'
-    'copy:typeScriptSrc'
+    'copy:uproxyLib',
+    'symlink:typescriptSrc',
+    'symlink:uproxyLibTypescriptSrc',
+    'symlink:thirdPartyTypeScript',
+    'symlink:uproxyLibThirdPartyTypescriptSrc',
+
     'copy:e2eCompiledJavaScript'
-    'copy:freedomProviders'
-    'copy:freedomForChrome'
-    'copy:chromeApp'
     'copy:crypto'
+    'copy:es6Promise'
 
     # Copy all source modules non-ts files
-    'copyModulesSrc'
-
+    'copy:diagnose' 
+    'copy:chromeApp'
   ]
 
   taskManager.add 'diagnose', [
     'base'
     'typescript:diagnose'
     'typescript:chromeApp'
-    'copy:chromeApp'
-    'copy:libForChromeApp'
+    'copy:chromeAppLib'
+    'copy:chromeAppFreedom'
   ]
 
   #-------------------------------------------------------------------------

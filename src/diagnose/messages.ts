@@ -192,7 +192,7 @@ declare module sha1 {
     // The class is determined by bits C1 and C0.
     var c1 = bytes[0] & 0x01;
     var c0 = bytes[1] & 0x10;
-    var clazz;
+    var clazz: Turn.MessageClass;
     if (c1) {
       if (c0) {
         clazz = MessageClass.FAILURE_RESPONSE;
@@ -219,7 +219,7 @@ declare module sha1 {
     var transactionId = bytes.subarray(8, 20);
 
     // Attributes.
-    var attributes = [];
+    var attributes: Turn.StunAttribute[] = [];
     var attributeOffset = 20;
     while (attributeOffset < bytes.length) {
       var attribute = parseStunAttribute(bytes.subarray(attributeOffset));
@@ -272,7 +272,7 @@ declare module sha1 {
     // Class (C1 and C0).
     var c1 = bytes[0] & 0x01;
     var c0 = bytes[1] & 0x10;
-    var clazz;
+    var clazz :Turn.MessageClass;
     // C1.
     if (message.clazz == MessageClass.SUCCESS_RESPONSE ||
         message.clazz == MessageClass.FAILURE_RESPONSE) {
@@ -353,7 +353,7 @@ declare module sha1 {
     // view on an ArrayBuffer a (in particular, views created with
     // subarray will share the same parent ArrayBuffer).
     // TODO: add uint8ArrayToString to uproxy-build-tools 
-    var a = [];
+    var a :string[] = [];
     for (var i = 0; i < bytesToBeHashed.length; ++i) {
       a.push(String.fromCharCode(bytes[i]));
     }
@@ -410,7 +410,7 @@ declare module sha1 {
 
     var type = bytes[0] << 8 | bytes[1];
     var length = bytes[2] << 8 | bytes[3];
-    var value;
+    var value :Uint8Array;
     if (length > 0) {
       value = bytes.subarray(4, 4 + length);
     }

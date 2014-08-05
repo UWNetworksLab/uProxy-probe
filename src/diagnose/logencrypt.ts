@@ -1,5 +1,5 @@
-/// <reference path='../freedom-typescript-api/interfaces/freedom.d.ts' />
-/// <reference path='../freedom-typescript-api/interfaces/promise.d.ts' />
+// <reference path='../freedom-typescript-api/freedom.d.ts' />
+// <reference path='../freedom-typescript-api/promise.d.ts' />
 
 interface DecryptResult {
   decrypt : { data: number[];} ;
@@ -7,8 +7,8 @@ interface DecryptResult {
 
 declare module e2e.async {
   class Result<T> {
-    addCallback(f: (T) => void) : void;
-    addErrback(f: (T) => void) : void;
+    addCallback(f: (T: any) => void) : void;
+    addErrback(f: (T: Error) => void) : void;
 
     // TODO: how to replace any? static member can not reference 'T'.
     //static getValue(result: Result<T>) : T;
@@ -22,7 +22,7 @@ declare module goog.storage.mechanism.HTML5LocalStorage {
 
 declare module e2e.openpgp {
   interface PassphraseCallbackFunc {
-    (str: string, f: (string) => void) : void;
+    (str: string, f: (passphrase: string) => void) : void;
   }
 
   class ContextImpl {
@@ -106,7 +106,7 @@ module pgpEncrypt {
     });
   }
 
-  export function testPgpEncryption(plaintext) : Promise<boolean> {
+  export function testPgpEncryption(plaintext: string) : Promise<boolean> {
     return doEncryption(plaintext)
     .then(function(result) {
         return result;
@@ -132,7 +132,7 @@ module pgpEncrypt {
     });
   }
 
-  export function doEncryption(plaintext) : Promise<string> {
+  export function doEncryption(plaintext: string) : Promise<string> {
     var keys = e2e.async.Result.getValue(
       pgpContext.searchPublicKey('<quantsword@gmail.com>'));
     return new Promise(function(F, R) {
@@ -150,7 +150,7 @@ module pgpEncrypt {
   }
 
   function str2array(str: string) : number[] {
-    var a = [];
+    var a: number[] = [];
     for (var i = 0; i < str.length; i++) {
       a.push(str.charCodeAt(i));
     }

@@ -1,10 +1,8 @@
-/// <reference path='../freedom-typescript-api/interfaces/freedom.d.ts' />
-/// <reference path='../freedom-typescript-api/interfaces/promise.d.ts' />
 /// <reference path='../logger/logger.d.ts' />
-/// <reference path='../freedom-typescript-api/interfaces/udp-socket.d.ts' />
+/// <reference path='../freedom-declarations/freedom.d.ts' />
+/// <reference path='../freedom-declarations/udp-socket.d.ts' />
 
 module Diagnose {
-  import UdpSocket = freedom.UdpSocket;
   var logger = freedom['Logger']();
   var tag = 'Diagnose';
 
@@ -20,7 +18,7 @@ module Diagnose {
   });
 
   freedom.on('getLogs', function() {
-    logger.getLogs().then(function(str) {
+    logger.getLogs().then((str: string) => {
       freedom.emit('print', str);
     }).then(() => {
       logger.reset();
@@ -33,9 +31,9 @@ module Diagnose {
 
   export function doUdpTest() {
     logger.debug(tag, 'start udp test');
-    var socket:UdpSocket = freedom['core.udpsocket']();
+    var socket: freedom_UdpSocket.Socket = freedom['core.udpsocket']();
 
-    function onUdpData(info: UdpSocket.RecvFromInfo) {
+    function onUdpData(info: freedom_UdpSocket.RecvFromInfo) {
       var response = new Uint32Array(info.data);
       var d = new Date();
       var laterncy = d.getSeconds() * 1000 + d.getMilliseconds() - response[0];
@@ -56,7 +54,7 @@ module Diagnose {
           return Promise.resolve(result);
         })
         .then(socket.getInfo)
-        .then((socketInfo: UdpSocket.SocketInfo) => {
+        .then((socketInfo: freedom_UdpSocket.SocketInfo) => {
           logger.debug(tag, 'listening on %1:%2', socketInfo.localAddress, 
                        socketInfo.localPort);
         })
@@ -82,7 +80,7 @@ module Diagnose {
   function doStunAccessTest() {
     //for (var i = 0; i < 1; i++) {
     for (var i = 0; i < stunServers.length; i++) {
-      var promises = [];
+      var promises : Promise<number>[] = [];
       for (var j = 0; j < 5; j++) {
         promises.push(pingStunServer(stunServers[i]));
       }
@@ -100,11 +98,11 @@ module Diagnose {
 
   function pingStunServer(serverAddr: string) {
     return new Promise<number>( (F, R) => {
-      var socket:UdpSocket = freedom['core.udpsocket']();
+      var socket:freedom_UdpSocket.Socket = freedom['core.udpsocket']();
       var parts = serverAddr.split(':');
       var start = Date.now();
 
-      var bindRequest = {
+      var bindRequest: Turn.StunMessage = {
         method: Turn.MessageMethod.BIND,
         clazz:  Turn.MessageClass.REQUEST,
         transactionId: new Uint8Array(12),
@@ -116,7 +114,7 @@ module Diagnose {
         uint16View[i] = Math.floor(Math.random() * 65535);
       }
 
-      socket.on('onData', (info: UdpSocket.RecvFromInfo) => {
+      socket.on('onData', (info: freedom_UdpSocket.RecvFromInfo) => {
         try {
           var response = Turn.parseStunMessage(new Uint8Array(info.data));
         } catch (e) {
@@ -145,7 +143,7 @@ module Diagnose {
             return socket.sendTo(bytes.buffer, parts[1], parseInt(parts[2]));
           }).then((written: number) => {
               logger.debug(tag, '%1 bytes sent correctly', written);
-          }).catch((e) => {
+          }).catch((e: Error) => {
               logger.debug(tag, JSON.stringify(e));
               R(e);
           })
