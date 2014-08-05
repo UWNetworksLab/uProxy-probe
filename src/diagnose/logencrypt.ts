@@ -1,10 +1,5 @@
-/// <reference path='../freedom-typescript-api/interfaces/freedom.d.ts' />
-/// <reference path='../freedom-typescript-api/interfaces/promise.d.ts' />
-
-
-interface Func<T, R> {
-    (item: T) : R;
-}
+// <reference path='../freedom-typescript-api/freedom.d.ts' />
+// <reference path='../freedom-typescript-api/promise.d.ts' />
 
 interface DecryptResult {
   decrypt : { data: number[];} ;
@@ -12,28 +7,34 @@ interface DecryptResult {
 
 declare module e2e.async {
   class Result<T> {
-    addCallback(f: Func<T, void>) : void;
-    addErrback(f: Func<T, void>) : void;
+    addCallback(f: (T: any) => void) : void;
+    addErrback(f: (T: Error) => void) : void;
 
-    // TODO: how to replace any?
+    // TODO: how to replace any? static member can not reference 'T'.
     //static getValue(result: Result<T>) : T;
     static getValue(result: any) : any;
   }
 }
 
+declare module goog.storage.mechanism.HTML5LocalStorage {
+  function prepareFreedom() : Promise<void>;
+}
+
 declare module e2e.openpgp {
   interface PassphraseCallbackFunc {
-    (str: string, f: Func<string, void>) : void;
+    (str: string, f: (passphrase: string) => void) : void;
   }
 
   class ContextImpl {
     setKeyRingPassphrase(passphrase: string) : void;
 
     importKey(passphraseCallback: PassphraseCallbackFunc,
-              keyStr: string) : e2e.async.Result<void>;
+              keyStr: string) : e2e.async.Result<string[]>;
 
     // We don't need to know how key is being represented, thus use any here.
     searchPublicKey(uid: string) : e2e.async.Result<any[]>;
+
+    searchPrivateKey(uid: string) : e2e.async.Result<any[]>;
 
     encryptSign(plaintext: string, options: any [], keys: any [], 
                 passphrase: string) : e2e.async.Result<string>;
@@ -90,14 +91,22 @@ module pgpEncrypt {
 
   var pgpContext: e2e.openpgp.ContextImpl = new e2e.openpgp.ContextImpl();
 
-  export function setup() : void {
-    // this function has the side-effect to setup the keyright storage. 
-    pgpContext.setKeyRingPassphrase('');
-
-    var t = pgpContext.importKey((str, f) => { f(''); }, privateKeyStr);
+  export function setup() : Promise<void> {
+    return goog.storage.mechanism.HTML5LocalStorage.prepareFreedom().then(() => {
+      // this function has the side-effect to setup the keyright storage. 
+      pgpContext.setKeyRingPassphrase('');
+    });
   }
 
-  export function testPgpEncryption(plaintext) : Promise<boolean> {
+  export function testKeyring() : Promise<boolean> {
+    return importKey(privateKeyStr).then((keys: string[]) : Promise<any[]> => {
+      return searchPrivateKey('<quantsword@gmail.com>');
+    }).then((foundKeys: any[]) => {
+      return foundKeys.length > 0;
+    });
+  }
+
+  export function testPgpEncryption(plaintext: string) : Promise<boolean> {
     return doEncryption(plaintext)
     .then(function(result) {
         return result;
@@ -111,7 +120,19 @@ module pgpEncrypt {
       });
   }
 
-  export function doEncryption(plaintext) : Promise<string> {
+  export function importKey(keyStr: string) : Promise<string[]> {
+    return new Promise(function(F, R) {
+      pgpContext.importKey((str, f) => { f(''); }, keyStr).addCallback(F);
+    });
+  }
+
+  export function searchPrivateKey(uid: string) : Promise<any[]> {
+    return new Promise(function(F, R) {
+      pgpContext.searchPrivateKey(uid).addCallback(F);
+    });
+  }
+
+  export function doEncryption(plaintext: string) : Promise<string> {
     var keys = e2e.async.Result.getValue(
       pgpContext.searchPublicKey('<quantsword@gmail.com>'));
     return new Promise(function(F, R) {
@@ -120,13 +141,16 @@ module pgpEncrypt {
   }
 
   export function doDecryption(ciphertext: string) : Promise<DecryptResult> {
+    pgpContext.importKey((str, f) => { f(''); }, privateKeyStr);
     return new Promise(function(F, R) {
-        pgpContext.verifyDecrypt(() : string => { return ''; }, ciphertext).addCallback(F);
+        pgpContext.verifyDecrypt(
+            () => { return ''; }, // passphrase callback
+            ciphertext).addCallback(F);
       });
   }
 
   function str2array(str: string) : number[] {
-    var a = [];
+    var a: number[] = [];
     for (var i = 0; i < str.length; i++) {
       a.push(str.charCodeAt(i));
     }

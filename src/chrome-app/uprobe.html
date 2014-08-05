@@ -2,17 +2,14 @@
 <html>
   <head>
     <title>diagnosis</title>
-    <script src='freedom-for-chrome/freedom-for-chrome.js' data-manifest='diagnose/diagnose.json'>
+    <script src='freedom-for-chrome-for-uproxy.js' data-manifest='diagnose/diagnose.json'>
       {
         "stayLocal": true,
-        "debug": true,
+        "debug": false,
         "strongIsolation": true
       }
     </script>
     <script src="arraybuffers/arraybuffers.js"></script>
-    <script src='end-to-end.compiled.js'></script>
-    <script src='googstorage.js'></script>
-    <script src='logencrypt.js'></script>
     <script src='uprobe.js'></script>
   </head>
   <body style="overflow: scroll;">
@@ -24,7 +21,7 @@
     <hr/>
     <button id='get-log-btn'>Get Log</button>
     <br>
-    <div id='log'>
+    <div id='log' style='height:500px; overflow:scroll'>
     </div>
   </body>
 </html>

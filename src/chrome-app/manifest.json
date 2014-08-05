@@ -6,8 +6,7 @@
   "app": {
     "background": {
       "scripts": [
-        "background.js", "uprobe.js", "logencrypt.js",
-        "end-to-end.compiled.js"
+        "background.js", "uprobe.js"
       ]
     }
   },
@@ -18,6 +17,7 @@
     } 
   },
   "permissions": [
+    "storage",
     { "socket": ["tcp-connect", "tcp-listen", "udp-bind", "udp-send-to"] }
   ]
 }
