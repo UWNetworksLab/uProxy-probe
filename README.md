@@ -48,16 +48,15 @@ root directory.
 
   ./do.sh build_library  
 
+  The above process will install all necessary dependency, and build the compiled js binary (don't be fooled by the term if you are new to Closure, it is still js code). 
 
-- The above process will install all necessary dependency, and build the 
-compiled js binary (don't be fooled by the term if you are new to Closure, 
-it is still js code).
+  The grunt process will grab the compiled library and copy it to where it is needed.
 
-- The grunt process will grab the compiled library and copy it to where it is needed.
+  In src/chrome-app/uprobe.js, the following lines call the pgp testing code. 
+  pgpEncrypt.setup();
+  pgpEncrypt.testPgpEncryption('asdfasdf');
 
-- The wrapping is done through logencrypt.ts, which now lives in src/diagnose directory. 
-For e2e code to work in chrome package, "googstorage.js" is needed to mock a 
-HTML5 storage with freedom storage api.
+  pgpEncrypt module is implemented in logencrypt.ts, with a little need from "googstorage.js" in the same directory. The actual work is done through "end-to-end.compiled.js".
 
 
 #### Manual
