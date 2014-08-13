@@ -1,13 +1,13 @@
-/// <reference path='../logger/logger.d.ts' />
-/// <reference path='../freedom-declarations/freedom.d.ts' />
-/// <reference path='../freedom-declarations/udp-socket.d.ts' />
+/// <reference path="../freedom/coreproviders/uproxylogging.d.ts" />
+/// <reference path='../freedom/typings/freedom.d.ts' />
+/// <reference path='../freedom/typings/udp-socket.d.ts' />
 
 module Diagnose {
-  var logger = freedom['Logger']();
-  var tag = 'Diagnose';
+  var log :Freedom_UproxyLogging.Log = freedom['core.log']('Diagnose');
+  var logManager: Freedom_UproxyLogging.LogManager = freedom['core.logmanager']();
 
   freedom.on('command', function(m) {
-    logger.debug(tag, 'received command ' + m);
+    log.debug('received command %1', [m]);
     if (m == 'send_udp') {
       doUdpTest();
     } else if (m == 'stun_access') {
@@ -18,10 +18,12 @@ module Diagnose {
   });
 
   freedom.on('getLogs', function() {
-    logger.getLogs().then((str: string) => {
-      freedom.emit('print', str);
+    logManager.getLogs().then((strs: string[]) => {
+      for (var i = 0; i < strs.length; i++) {
+        freedom.emit('print', strs[i]);
+      }
     }).then(() => {
-      logger.reset();
+      logManager.clearLogs();
     });
   });
 
@@ -30,7 +32,7 @@ module Diagnose {
   }
 
   export function doUdpTest() {
-    logger.debug(tag, 'start udp test');
+    log.debug('start udp test');
     var socket: freedom_UdpSocket.Socket = freedom['core.udpsocket']();
 
     function onUdpData(info: freedom_UdpSocket.RecvFromInfo) {
@@ -55,16 +57,15 @@ module Diagnose {
         })
         .then(socket.getInfo)
         .then((socketInfo: freedom_UdpSocket.SocketInfo) => {
-          logger.debug(tag, 'listening on %1:%2', socketInfo.localAddress, 
-                       socketInfo.localPort);
+          log.debug('listening on %1:%2', 
+                    [socketInfo.localAddress, socketInfo.localPort]);
         })
         .then(() => {
           socket.on('onData', onUdpData);
           var pingReq = new Uint32Array(1);
           var d = new Date();
           pingReq[0] = d.getSeconds() * 1000 + d.getMilliseconds();
-          logger.info(tag, 'sent ping request to %1:%2',
-                      '199.223.236.121', 3333);
+          log.info('sent ping request to %1:%2', ['199.223.236.121', 3333]);
           socket.sendTo(pingReq.buffer, '199.223.236.121', 3333);
         });
   }
@@ -78,7 +79,6 @@ module Diagnose {
   ];
 
   function doStunAccessTest() {
-    //for (var i = 0; i < 1; i++) {
     for (var i = 0; i < stunServers.length; i++) {
       var promises : Promise<number>[] = [];
       for (var j = 0; j < 5; j++) {
@@ -118,7 +118,7 @@ module Diagnose {
         try {
           var response = Turn.parseStunMessage(new Uint8Array(info.data));
         } catch (e) {
-          logger.error(tag, 'Failed to parse bind request from %1', serverAddr);
+          log.error('Failed to parse bind request from %1', [serverAddr]);
           R(e);
           return;
         }
@@ -142,16 +142,16 @@ module Diagnose {
           }).then(() => {
             return socket.sendTo(bytes.buffer, parts[1], parseInt(parts[2]));
           }).then((written: number) => {
-              logger.debug(tag, '%1 bytes sent correctly', written);
+              log.debug('%1 bytes sent correctly', [written]);
           }).catch((e: Error) => {
-              logger.debug(tag, JSON.stringify(e));
+              log.debug(JSON.stringify(e));
               R(e);
           })
     });
   }
 
   function doPgpTest() {
-    logger.debug(tag, 'start doPgpTest');
+    log.debug('start doPgpTest');
 
     pgpEncrypt.setup().then(() => {
       pgpEncrypt.testPgpEncryption('asdfasdf').then(function(result) {

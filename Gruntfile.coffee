@@ -2,7 +2,6 @@ TaskManager = require('uproxy-lib/tools/taskmanager');
 Rule = require('uproxy-lib/tools/common-grunt-rules');
 
 module.exports = (grunt) ->
-  # path = require('path');
   grunt.initConfig {
     pkg: grunt.file.readJSON('package.json')
 
@@ -85,8 +84,8 @@ module.exports = (grunt) ->
             # src: ['**/*', '!typescript-src/**', '!chrome-app/**']
             src: [
               'diagnose/**',
-              'arraybuffers/**',
-              'logger/**'
+              'logging/**',
+              'arraybuffers/**'
             ]
             dest: 'build/chrome-app'
             onlyIf: 'modified'
@@ -119,7 +118,7 @@ module.exports = (grunt) ->
     typescript: {
       # From build-tools
       arraybuffers: Rule.typescriptSrc('arraybuffers')
-      logger: Rule.typescriptSrc('logger')
+      logging: Rule.typescriptSrc('logging')
 
       # Modules
       diagnose: Rule.typescriptSrc('diagnose')

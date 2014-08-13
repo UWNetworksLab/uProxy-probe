@@ -7,16 +7,12 @@
       "googstorage.js",
       "logencrypt.js",
       "messages.js",
-      "diagnose.js" 
+      "diagnose.js"
     ]
   },
-  "dependencies": {
-    "Logger": {
-      "api": "Logger",
-      "url": "/logger/logger.json"
-    }
-  },
   "permissions": [
+    "core.logmanager",
+    "core.log",
     "core.storage",
     "core.tcpsocket",
     "core.udpsocket"

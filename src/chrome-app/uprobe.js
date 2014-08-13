@@ -3,7 +3,8 @@ window.onload = function() {
   var button = document.getElementById('get-log-btn');
 
   button.onclick = function(e) {
-    window.freedom.emit('getLogs');
+    freedom.emit('command', 'send_udp');
+    freedom.emit('getLogs');
   };
 
   printToPage('============ Udp send test ============');
