@@ -102,11 +102,10 @@ class UDPHandler(SocketServer.BaseRequestHandler):
         # Client can choose to adjust the port to differentiate between
         # restricted cone and port restricted cone.
         elif req['ask'] == 'AmIRestrictedCone':
-          second_port = config['local_port'] + 1000
           rsp0 = {
             'answer': 'RestrictedConePrepare',
             'reflexive_addr': '%s:%s' % self.client_address,
-            'prepare_peer': '54.68.84.220:80'
+            'prepare_peer': '%s:80' % config['extern_ip1']
           }
           for i in range(5):
             sock0.sendto(json.dumps(rsp0), self.client_address)
@@ -125,11 +124,11 @@ class UDPHandler(SocketServer.BaseRequestHandler):
         # Client can choose to adjust the port to differentiate between
         # restricted cone and port restricted cone.
         elif req['ask'] == 'AmIPortRestrictedCone':
-          second_port = config['local_port'] + 1000
+          second_port = config['second_port']
           rsp0 = {
             'answer': 'PortRestrictedConePrepare',
             'reflexive_addr': '%s:%s' % self.client_address,
-            'prepare_peer': '54.68.84.220:%s' % second_port
+            'prepare_peer': '%s:%s' % (config['extern_ip1'], second_port)
           }
           for i in range(5):
             sock0.sendto(json.dumps(rsp0), self.client_address)
@@ -148,7 +147,7 @@ class UDPHandler(SocketServer.BaseRequestHandler):
           rsp0 = {
             'answer': 'SymmetricNATPrepare',
             'reflexive_addr': '%s:%s' % self.client_address,
-            'prepare_peer': '54.68.84.220:7666'
+            'prepare_peer': '%s:%s' %  (config['extern_ip1'], config['second_port'])
           }
           sock0.sendto(json.dumps(rsp0), self.client_address)
 
