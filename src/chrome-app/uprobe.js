@@ -3,7 +3,6 @@ window.onload = function() {
   var button = document.getElementById('get-log-btn');
 
   button.onclick = function(e) {
-    freedom.emit('command', 'send_udp');
     freedom.emit('getLogs');
   };
 
@@ -11,14 +10,15 @@ window.onload = function() {
   freedom.emit('command', 'send_udp');
 
   window.setTimeout(function() {
-    printToPage('============ Stun server access test ============')
-    freedom.emit('command', 'stun_access');
+    printToPage('============ Nat provoking test ============');
+    freedom.emit('command', 'nat_provoking');
   }, 3000);
 
   window.setTimeout(function() {
-    printToPage('============ Log encryption test with e2e ============')
-    freedom.emit('command', 'pgp_test');
-  }, 7000);
+    printToPage('============ Stun server access test ============')
+    freedom.emit('command', 'stun_access');
+  }, 20000);
+
 }
 
 function printToPage(msg) {

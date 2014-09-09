@@ -3,9 +3,7 @@
   "description": "Diagnose Freedom manifest",
   "app": {
     "script": [
-      "end-to-end.compiled.js",
-      "googstorage.js",
-      "logencrypt.js",
+      "../arraybuffers/arraybuffers.js",
       "messages.js",
       "diagnose.js"
     ]
