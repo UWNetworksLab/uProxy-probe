@@ -133,7 +133,7 @@ class NatDetectClient:
     req = {
       'ask': 'AmIPortRestrictedCone'
     }
-    for i in range(10):
+    for i in range(20):
       self.sock.sendto(json.dumps(req), self.addr)
       time.sleep(0.3)
       if self.response_queue:

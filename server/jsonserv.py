@@ -2,9 +2,6 @@
 
 import sys
 import json
-import pprint
-import random
-import datetime
 import select
 import time
 import threading
@@ -13,9 +10,6 @@ import optparse
 import socket
 import SocketServer
 
-
-ECHO_PORT = 50000 + 7
-BUFSIZE = 2048
 
 quit_prog = False
 
