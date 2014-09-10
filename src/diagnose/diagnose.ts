@@ -228,7 +228,9 @@ module Diagnose {
             var reqStr: string = JSON.stringify({ 'ask': 'AmIFullCone' });
             log.debug('send ' + reqStr);
             var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
-            socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            for (var i = 0; i < 10; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
           })
           .then(() => {
             return new Promise<void>((F, R) => {
@@ -243,7 +245,9 @@ module Diagnose {
             var reqStr: string = JSON.stringify({ 'ask': 'AmIRestrictedCone' });
             log.debug(reqStr);
             var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
-            socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            for (var i = 0; i < 3; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
           })
           .then(() => {
             return new Promise<void>((F, R) => {
@@ -258,7 +262,9 @@ module Diagnose {
             var reqStr: string = JSON.stringify({ 'ask': 'AmIPortRestrictedCone' });
             log.debug(reqStr);
             var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
-            socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            for (var i = 0; i < 3; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
           })
           .then(() => {
             return new Promise<void>((F, R) => {
@@ -273,7 +279,9 @@ module Diagnose {
             var reqStr: string = JSON.stringify({ 'ask': 'AmISymmetricNAT' });
             log.debug(reqStr);
             var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
-            socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            for (var i = 0; i < 3; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
           })
           .then(() => {
             return new Promise<void>((F, R) => {
