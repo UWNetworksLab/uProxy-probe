@@ -30,7 +30,7 @@ def main():
                       help="configuration FILE in json format.", metavar="FILE")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_false",
                       default=True, 
-                      help="if the session is verbose.")
+                      help="enable verbose debugging output.")
     parser.add_option("--local_port", dest="local_port", type="int",
                       help="local PORT for this program to listen to", metavar="PORT")
 
@@ -83,7 +83,7 @@ class UDPHandler(SocketServer.BaseRequestHandler):
           random_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
           random_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
           # pick a random port
-          random_sock.bind((config['interface1'], 0))
+          random_sock.bind((config['private_ip2'], 0))
           random_sock.sendto(json.dumps(rsp), self.client_address)
 
         # For restricted-cone detection, server tell the client to prepare
@@ -94,7 +94,7 @@ class UDPHandler(SocketServer.BaseRequestHandler):
           rsp0 = {
             'answer': 'RestrictedConePrepare',
             'reflexive_addr': '%s:%s' % self.client_address,
-            'prepare_peer': '%s:80' % config['extern_ip1']
+            'prepare_peer': '%s:80' % config['public_ip2']
           }
           for i in range(5):
             sock.sendto(json.dumps(rsp0), self.client_address)
@@ -116,7 +116,7 @@ class UDPHandler(SocketServer.BaseRequestHandler):
           rsp0 = {
             'answer': 'PortRestrictedConePrepare',
             'reflexive_addr': '%s:%s' % self.client_address,
-            'prepare_peer': '%s:%s' % (config['extern_ip1'], second_port)
+            'prepare_peer': '%s:%s' % (config['public_ip2'], second_port)
           }
           for i in range(5):
             sock.sendto(json.dumps(rsp0), self.client_address)
@@ -137,7 +137,7 @@ class UDPHandler(SocketServer.BaseRequestHandler):
           rsp0 = {
             'answer': 'SymmetricNATPrepare',
             'reflexive_addr': '%s:%s' % self.client_address,
-            'prepare_peer': '%s:%s' %  (config['extern_ip1'], config['second_port'])
+            'prepare_peer': '%s:%s' %  (config['public_ip2'], config['second_port'])
           }
           sock.sendto(json.dumps(rsp0), self.client_address)
 
@@ -171,7 +171,7 @@ class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
 def start_json_server(config):
     SocketServer.ThreadingUDPServer.allow_reuse_address = True
 
-    server = ThreadedUDPServer((config['interface0'], config['local_port']), UDPHandler)
+    server = ThreadedUDPServer((config['private_ip1'], config['local_port']), UDPHandler)
 
     # Start a thread with the server -- that thread will then start one
     # more thread for each request
@@ -182,7 +182,7 @@ def start_json_server(config):
     server_thread.start()
     print "Server loop running in thread:", server_thread.name
 
-    server1 = ThreadedUDPServer((config['interface1'], config['second_port']), SymmetricUDPHandler)
+    server1 = ThreadedUDPServer((config['private_ip2'], config['second_port']), SymmetricUDPHandler)
 
     # record this second listen socket so that server can send reply from
     # this ip/port, but not as response to request received by this ip/port.
