@@ -10,7 +10,15 @@ import optparse
 import socket
 import SocketServer
 
+""" 
+This program should be run on a "server" machine with at least 2 public ips
+to enable client side NAT detection. Existing code and configuration is coded
+to be run in a EC2 instance, with one public ip (default), and one elastic ip 
+(also public). It should be fairly easy to change the code to work in another
+server environment as long as that server has more than one external ips.
+"""
 
+# global flag to notify any thread to exit if "Ctrl-C" is pressed.
 quit_prog = False
 
 def sigint_handler(signum, frame):

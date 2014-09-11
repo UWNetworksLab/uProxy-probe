@@ -4,6 +4,8 @@
 /// <reference path='../arraybuffers/arraybuffers.d.ts' />
 
 module Diagnose {
+  // Both Ping and NAT type detection need help from a server. The following
+  // ip/port is the instance we run on EC2.
   var TEST_SERVER = '54.68.73.184';
   var TEST_PORT = 6666;
 
@@ -53,7 +55,7 @@ module Diagnose {
       }
     }   
 
-    socket.bind('0.0.0.0', 5758)
+    socket.bind('0.0.0.0', 0)
         .then((result: number) => {
           if (result != 0) {
             return Promise.reject(new Error('listen failed to bind :5758' +
@@ -158,6 +160,9 @@ module Diagnose {
     });
   }
 
+  // The following code needs the help from a server to do its job. The server
+  // code can be found jsonserv.py in the same repository. One instance is
+  // running in EC2.
   function doNatProvoking() : Promise<String> {
     return new Promise((F, R) => {
       log.debug('start NAT provoking');

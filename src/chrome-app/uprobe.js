@@ -6,16 +6,16 @@ window.onload = function() {
     freedom.emit('getLogs');
   };
 
-  printToPage('============ Udp send test ============');
+  printToPage('============ UDP send test ============');
   freedom.emit('command', 'send_udp');
 
   window.setTimeout(function() {
-    printToPage('============ Nat provoking test ============');
+    printToPage('============ NAT provoking test ============');
     freedom.emit('command', 'nat_provoking');
   }, 3000);
 
   window.setTimeout(function() {
-    printToPage('============ Stun server access test ============')
+    printToPage('============ STUN server access test ============')
     freedom.emit('command', 'stun_access');
   }, 20000);
 
