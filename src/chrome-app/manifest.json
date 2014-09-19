@@ -12,8 +12,8 @@
   },
   "sockets": {
     "udp": {
-      "send": ":3333",
-      "bind": ":5758"
+      "send": ":*",
+      "bind": ":*"
     } 
   },
   "permissions": [

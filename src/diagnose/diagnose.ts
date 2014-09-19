@@ -1,8 +1,14 @@
 /// <reference path="../freedom/coreproviders/uproxylogging.d.ts" />
 /// <reference path='../freedom/typings/freedom.d.ts' />
 /// <reference path='../freedom/typings/udp-socket.d.ts' />
+/// <reference path='../arraybuffers/arraybuffers.d.ts' />
 
 module Diagnose {
+  // Both Ping and NAT type detection need help from a server. The following
+  // ip/port is the instance we run on EC2.
+  var TEST_SERVER = '54.68.73.184';
+  var TEST_PORT = 6666;
+
   var log :Freedom_UproxyLogging.Log = freedom['core.log']('Diagnose');
   var logManager: Freedom_UproxyLogging.LogManager = freedom['core.logmanager']();
 
@@ -12,8 +18,11 @@ module Diagnose {
       doUdpTest();
     } else if (m == 'stun_access') {
       doStunAccessTest();
-    } else if (m == 'pgp_test') {
-      doPgpTest();
+    } else if (m == 'nat_provoking') {
+      doNatProvoking().then((natType: String) => {
+        log.debug('!!! natType =' + natType);
+        freedom.emit('print', 'NAT type is ' + natType);
+      });
     }
   });
 
@@ -36,18 +45,17 @@ module Diagnose {
     var socket: freedom_UdpSocket.Socket = freedom['core.udpsocket']();
 
     function onUdpData(info: freedom_UdpSocket.RecvFromInfo) {
-      var response = new Uint32Array(info.data);
-      var d = new Date();
-      var laterncy = d.getSeconds() * 1000 + d.getMilliseconds() - response[0];
-      if (laterncy < 0) {
-        laterncy += 60 * 1000;
+      var rspStr = ArrayBuffers.arrayBufferToString(info.data);
+      log.debug(rspStr);
+
+      var rsp = JSON.parse(rspStr);
+      if (rsp['answer'] == 'Pong') {
+        print('Pong resonse received, latency=' + 
+              (Date.now() - rsp['ping_time']) + 'ms')
       }
-      print('Ping response received from ' +
-            info.address + ':' + info.port +
-            ', latency=' + laterncy + 'ms');
     }   
 
-    socket.bind('0.0.0.0', 5758)
+    socket.bind('0.0.0.0', 0)
         .then((result: number) => {
           if (result != 0) {
             return Promise.reject(new Error('listen failed to bind :5758' +
@@ -63,10 +71,12 @@ module Diagnose {
         .then(() => {
           socket.on('onData', onUdpData);
           var pingReq = new Uint32Array(1);
-          var d = new Date();
-          pingReq[0] = d.getSeconds() * 1000 + d.getMilliseconds();
-          log.info('sent ping request to %1:%2', ['199.223.236.121', 3333]);
-          socket.sendTo(pingReq.buffer, '199.223.236.121', 3333);
+          var reqStr = JSON.stringify({ 
+            'ask': 'Ping',
+            'ping_time': Date.now()
+          });
+          var req = ArrayBuffers.stringToArrayBuffer(reqStr);
+          socket.sendTo(req, TEST_SERVER, TEST_PORT);
         });
   }
 
@@ -150,20 +160,151 @@ module Diagnose {
     });
   }
 
-  function doPgpTest() {
-    log.debug('start doPgpTest');
+  // The following code needs the help from a server to do its job. The server
+  // code can be found jsonserv.py in the same repository. One instance is
+  // running in EC2.
+  function doNatProvoking() : Promise<String> {
+    return new Promise((F, R) => {
+      log.debug('start NAT provoking');
+      var socket: freedom_UdpSocket.Socket = freedom['core.udpsocket']();
+      var timerId: number = -1;
 
-    pgpEncrypt.setup().then(() => {
-      pgpEncrypt.testPgpEncryption('asdfasdf').then(function(result) {
-        if (result) {
-          print('pgp encryption test succeeded.');
+      var rejectShortcut: (e: any) => void = null;
+
+      function onUdpData(info: freedom_UdpSocket.RecvFromInfo) {
+        var rspStr: string = ArrayBuffers.arrayBufferToString(info.data);
+        log.debug('receive response = ' + rspStr);
+
+        var rsp = JSON.parse(rspStr);
+
+        if (rsp['answer'] == 'FullCone') {
+          F('FullCone');
+        } else if (rsp['answer'] == 'RestrictedConePrepare') {
+          var peer_addr: string[] = rsp['prepare_peer'].split(':');
+          var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer('{"ask":""}');
+          log.debug('reply to RestrictedConePrepare');
+          socket.sendTo(req, peer_addr[0], parseInt(peer_addr[1]));
+          return;
+        } else if (rsp['answer'] == 'RestrictedCone') {
+          F('RestrictedCone');
+        } else if (rsp['answer'] == 'PortRestrictedConePrepare') {
+          var peer_addr: string[] = rsp['prepare_peer'].split(':');
+          var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer('{"ask":""}');
+          log.debug('reply to PortRestrictedConePrepare');
+          socket.sendTo(req, peer_addr[0], parseInt(peer_addr[1]));
+          return;
+        } else if (rsp['answer'] == 'PortRestrictedCone') {
+          F('PortRestrictedCone');
+        } else if (rsp['answer'] == 'SymmetricNATPrepare') {
+          var peer_addr: string[] = rsp['prepare_peer'].split(':');
+          var reqStr: string = JSON.stringify({ 'ask': 'AmISymmetricNAT' });
+          var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
+          socket.sendTo(req, peer_addr[0], parseInt(peer_addr[1]));
+          return;
+        } else if (rsp['answer'] == 'SymmetricNAT') {
+          F('SymmetricNAT');
         } else {
-          print('pgp encryption test failed.');
-        } });
+          return;
+        }
+        
+        if (timerId != -1) {
+          clearTimeout(timerId);
+          if (rejectShortcut) {
+            rejectShortcut(new Error('shortCircuit'));
+          }
+        }
+      }   
 
-      pgpEncrypt.testKeyring().then(function(result) {
-        print('PGP keyring test succeeded.');
-      });
+      socket.on('onData', onUdpData);
+
+      socket.bind('0.0.0.0', 0)
+          .then((result: number) => {
+            if (result != 0) {
+              return Promise.reject(new Error('failed to bind to a port: err=' + result));
+            }
+            return Promise.resolve(result);
+          })
+          .then(socket.getInfo)
+          .then((socketInfo: freedom_UdpSocket.SocketInfo) => {
+            log.debug('listening on %1:%2', 
+                      [socketInfo.localAddress, socketInfo.localPort]);
+          })
+          .then(() => {
+            var reqStr: string = JSON.stringify({ 'ask': 'AmIFullCone' });
+            log.debug('send ' + reqStr);
+            var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
+            for (var i = 0; i < 10; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
+          })
+          .then(() => {
+            return new Promise<void>((F, R) => {
+              rejectShortcut = R;
+              timerId = setTimeout(() => {
+                timerId = -1;
+                F();
+              }, 2000);
+            });
+          })
+          .then(() => {
+            var reqStr: string = JSON.stringify({ 'ask': 'AmIRestrictedCone' });
+            log.debug(reqStr);
+            var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
+            for (var i = 0; i < 3; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
+          })
+          .then(() => {
+            return new Promise<void>((F, R) => {
+              rejectShortcut = R;
+              timerId = setTimeout(() => {
+                timerId = -1;
+                F();
+              }, 3000);
+            });
+          })
+          .then(() => {
+            var reqStr: string = JSON.stringify({ 'ask': 'AmIPortRestrictedCone' });
+            log.debug(reqStr);
+            var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
+            for (var i = 0; i < 3; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
+          })
+          .then(() => {
+            return new Promise<void>((F, R) => {
+              rejectShortcut = R;
+              timerId = setTimeout(() => {
+                timerId = -1;
+                F();
+              }, 10000);
+            });
+          })
+          .then(() => {
+            var reqStr: string = JSON.stringify({ 'ask': 'AmISymmetricNAT' });
+            log.debug(reqStr);
+            var req: ArrayBuffer = ArrayBuffers.stringToArrayBuffer(reqStr);
+            for (var i = 0; i < 3; i++) {
+              socket.sendTo(req, TEST_SERVER, TEST_PORT);
+            }
+          })
+          .then(() => {
+            return new Promise<void>((F, R) => {
+              rejectShortcut = R;
+              timerId = setTimeout(() => {
+                timerId = -1;
+                F();
+              }, 3000);
+            });
+          })
+          .catch((e: Error) => {
+            if (e.message != 'shortCircuit') {
+              log.error('something wrong: ' + e.message);
+              R(e);
+            } else {
+              log.debug('shortCircuit');
+            }
+          });
     });
   }
 }
