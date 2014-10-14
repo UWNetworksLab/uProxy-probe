@@ -12,7 +12,9 @@ module Diagnose {
   var log :Freedom_UproxyLogging.Log = freedom['core.log']('Diagnose');
   var logManager: Freedom_UproxyLogging.LogManager = freedom['core.logmanager']();
 
+  logManager.setBufferedLogFilter(['*:I']);
   freedom.on('command', function(m) {
+    console.log('!!! received command');
     log.debug('received command %1', [m]);
     if (m == 'send_udp') {
       doUdpTest();

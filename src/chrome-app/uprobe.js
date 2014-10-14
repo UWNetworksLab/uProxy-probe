@@ -30,7 +30,7 @@ function printToPage(msg) {
   }
 }
 
-window.freedom.on('print', function(msg) {
+freedom.on('print', function(msg) {
   var lines = msg.split('\n');
   for (var i = 0; i < lines.length; i++) {
     printToPage(lines[i]);
