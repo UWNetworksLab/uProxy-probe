@@ -6,7 +6,7 @@
   "app": {
     "background": {
       "scripts": [
-        "background.js", "uprobe.js"
+        "background.js"
       ]
     }
   },

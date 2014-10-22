@@ -3,6 +3,7 @@ window.onload = function() {
   var button = document.getElementById('get-log-btn');
 
   button.onclick = function(e) {
+    printToPage('--- dump buffered logs ---');
     freedom.emit('getLogs');
   };
 
@@ -18,7 +19,6 @@ window.onload = function() {
     printToPage('============ STUN server access test ============')
     freedom.emit('command', 'stun_access');
   }, 20000);
-
 }
 
 function printToPage(msg) {
@@ -30,7 +30,7 @@ function printToPage(msg) {
   }
 }
 
-window.freedom.on('print', function(msg) {
+freedom.on('print', function(msg) {
   var lines = msg.split('\n');
   for (var i = 0; i < lines.length; i++) {
     printToPage(lines[i]);

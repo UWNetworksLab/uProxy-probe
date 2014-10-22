@@ -2,6 +2,7 @@
 /// <reference path='../freedom/typings/freedom.d.ts' />
 /// <reference path='../freedom/typings/udp-socket.d.ts' />
 /// <reference path='../arraybuffers/arraybuffers.d.ts' />
+/// <reference path='messages.ts' />
 
 module Diagnose {
   // Both Ping and NAT type detection need help from a server. The following
@@ -12,6 +13,7 @@ module Diagnose {
   var log :Freedom_UproxyLogging.Log = freedom['core.log']('Diagnose');
   var logManager: Freedom_UproxyLogging.LogManager = freedom['core.logmanager']();
 
+  logManager.setBufferedLogFilter(['*:I']);
   freedom.on('command', function(m) {
     log.debug('received command %1', [m]);
     if (m == 'send_udp') {
@@ -41,7 +43,7 @@ module Diagnose {
   }
 
   export function doUdpTest() {
-    log.debug('start udp test');
+    log.info('perform udp test');
     var socket: freedom_UdpSocket.Socket = freedom['core.udpsocket']();
 
     function onUdpData(info: freedom_UdpSocket.RecvFromInfo) {
@@ -89,6 +91,7 @@ module Diagnose {
   ];
 
   function doStunAccessTest() {
+    log.info('perform Stun access test');
     for (var i = 0; i < stunServers.length; i++) {
       var promises : Promise<number>[] = [];
       for (var j = 0; j < 5; j++) {
@@ -165,7 +168,7 @@ module Diagnose {
   // running in EC2.
   function doNatProvoking() : Promise<String> {
     return new Promise((F, R) => {
-      log.debug('start NAT provoking');
+      log.info('perform NAT provoking');
       var socket: freedom_UdpSocket.Socket = freedom['core.udpsocket']();
       var timerId: number = -1;
 
