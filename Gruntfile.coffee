@@ -86,10 +86,6 @@ module.exports = (grunt) ->
     'diagnose'
   ]
 
-  taskManager.add 'test', [
-    'build'
-  ]
-
   taskManager.add 'default', [
     'build'
   ]

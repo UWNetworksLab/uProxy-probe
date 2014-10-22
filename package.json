@@ -19,14 +19,13 @@
     "grunt-contrib-copy": "^0.6.0",
     "grunt-contrib-symlink": "~0.3.0",
     "grunt-env": "^0.4.1",
-    "uproxy-lib": "^13.0.0",
+    "uproxy-lib": "^13.2.0",
     "uproxy-end-to-end": "^0.1.0",
     "grunt-ts": "^1.11",
     "typescript": "^1.1.0-1",
     "freedom": "~0.5.7",
     "freedom-for-chrome": "~0.3.3",
-    "freedom-for-firefox": "~0.4.3",
-    "grunt-contrib-jasmine": "~0.7.0"
+    "freedom-for-firefox": "~0.4.3"
   },
   "scripts": {
     "test": "grunt test"
