@@ -1,4 +1,4 @@
-/// <reference path="../freedom/coreproviders/uproxylogging.d.ts" />
+/// <reference path="../logging/logging.d.ts" />
 /// <reference path='../freedom/typings/freedom.d.ts' />
 /// <reference path='../freedom/typings/udp-socket.d.ts' />
 /// <reference path='../arraybuffers/arraybuffers.d.ts' />
@@ -10,11 +10,11 @@ module Diagnose {
   var TEST_SERVER = '54.68.73.184';
   var TEST_PORT = 6666;
 
-  var log :Freedom_UproxyLogging.Log = freedom['core.log']('Diagnose');
-  var logManager: Freedom_UproxyLogging.LogManager = freedom['core.logmanager']();
 
-  logManager.setBufferedLogFilter(['*:I']);
-  freedom.on('command', function(m) {
+  var log :Logging.Log = new Logging.Log('Diagnose');
+
+  Logging.setBufferedLogFilter(['*:I']);
+  freedom().on('command', function(m :string) {
     log.debug('received command %1', [m]);
     if (m == 'send_udp') {
       doUdpTest();
@@ -23,23 +23,21 @@ module Diagnose {
     } else if (m == 'nat_provoking') {
       doNatProvoking().then((natType: String) => {
         log.debug('!!! natType =' + natType);
-        freedom.emit('print', 'NAT type is ' + natType);
+        freedom().emit('print', 'NAT type is ' + natType);
       });
     }
   });
 
-  freedom.on('getLogs', function() {
-    logManager.getLogs().then((strs: string[]) => {
-      for (var i = 0; i < strs.length; i++) {
-        freedom.emit('print', strs[i]);
-      }
-    }).then(() => {
-      logManager.clearLogs();
-    });
+  freedom().on('getLogs', function() {
+    var strs :string[] = Logging.getLogs();
+    for (var i = 0; i < strs.length; i++) {
+      freedom().emit('print', strs[i]);
+    }
+    Logging.clearLogs();
   });
 
   function print(m: any) {
-    freedom.emit('print', m);
+    freedom().emit('print', m);
   }
 
   export function doUdpTest() {
