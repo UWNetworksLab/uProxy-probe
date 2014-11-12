@@ -51,25 +51,11 @@ module.exports = (grunt) ->
         } ]
 
     copy:
-      arraybuffers: Rule.copyModule 'arraybuffers'
-      logging: Rule.copyModule 'logging'
-
-      freedomTypings: Rule.copyModule 'freedom/typings'
-
       diagnose: Rule.copyModule 'diagnose'
       chromeApp: Rule.copyModule 'chrome-app'
       chromeAppLib: Rule.copySampleFiles 'chrome-app'
 
     ts:
-      # freedom/typings only contains specs and declarations.
-      freedomTypingsSpecDecl: Rule.typescriptSpecDecl 'freedom/typings'
-
-      arraybuffers: Rule.typescriptSrc 'arraybuffers'
-      arraybuffersSpecDecl: Rule.typescriptSpecDecl 'arraybuffers'
-
-      logging: Rule.typescriptSrc 'logging'
-      loggingSpecDecl: Rule.typescriptSpecDecl 'logging'
-
       diagnose: Rule.typescriptSrc('diagnose')
       chromeApp: Rule.typescriptSrc('chrome-app')
 
@@ -94,30 +80,8 @@ module.exports = (grunt) ->
     'symlink:freedom'
   ]
 
-  taskManager.add 'freedom', [
-    'base'
-    'ts:freedomTypingsSpecDecl'
-    'copy:freedomTypings'
-  ]
-
-  taskManager.add 'arraybuffers', [
-    'base'
-    'ts:arraybuffers'
-    'ts:arraybuffersSpecDecl'
-    'copy:arraybuffers'
-  ]
-
-  taskManager.add 'logging', [
-    'base'
-    'ts:logging'
-    'ts:loggingSpecDecl'
-    'copy:logging'
-  ]
-
   taskManager.add 'diagnose', [
     'base'
-    'logging'
-    'freedom'
     'ts:diagnose'
     'ts:chromeApp'
     'copy:diagnose'
