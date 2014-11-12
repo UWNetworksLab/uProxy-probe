@@ -41,6 +41,15 @@ module.exports = (grunt) ->
           dest: 'build/third_party/'
         ]
 
+      # Symlink the Chrome build of Freedom under build/freedom/.
+      freedom:
+        files: [ {
+          expand: true
+          cwd: path.dirname(require.resolve('freedom-for-chrome/Gruntfile'))
+          src: ['freedom-for-chrome.js']
+          dest: 'build/freedom/'
+        } ]
+
     copy:
       diagnose: Rule.copyModule 'diagnose'
       chromeApp: Rule.copyModule 'chrome-app'
@@ -68,6 +77,7 @@ module.exports = (grunt) ->
     'symlink:build',
     'symlink:uproxyLibBuild',
     'symlink:uproxyLibThirdParty',
+    'symlink:freedom'
   ]
 
   taskManager.add 'diagnose', [
