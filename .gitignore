@@ -16,6 +16,3 @@
 *.vpw*
 *.vtg
 *~
-build
-tmp
-node_modules
