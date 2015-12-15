@@ -34,7 +34,7 @@ def main():
 
     parser = optparse.OptionParser()
     parser.add_option("-c", "--config", dest="config_filename",
-                      default="probe-server.cfg",
+                      default="server.cfg",
                       help="configuration FILE in json format.", metavar="FILE")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_false",
                       default=True, 

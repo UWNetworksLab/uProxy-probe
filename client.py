@@ -31,7 +31,7 @@ def main():
 
   parser = optparse.OptionParser()
   parser.add_option("-c", "--config", dest="config_filename",
-                    default="probe-client.cfg",
+                    default="client.cfg",
                     help="configuration FILE in json format.", metavar="FILE")
   parser.add_option("--remote_host", dest="remote_host", 
                     help="HOST name for client to connect to", metavar="HOST")
